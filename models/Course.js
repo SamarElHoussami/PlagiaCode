@@ -1,36 +1,33 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 // Create Schema
-const UserSchema = new Schema({
+const CourseSchema = new Schema({
   name: {
     type: String,
     required: true
   },
-  email: {
+  code: {
     type: String,
     required: true
   },
-  password: {
-    type: String,
+  teacher: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
     required: true
-  },
-  type: {
-    type: String,
-    required: true
-  },
-  courses: {
-    type: [Schema.Types.ObjectId],
-    ref: 'Course',
-    default: null
-  },
-  ta: {
-    type: [Schema.Types.ObjectId],
-    ref: 'Course',
-    default: null
   },
   assignments: {
     type: [Schema.Types.ObjectId],
-    ref: 'Assignment',
+    ref: 'Posting',
+    default: null
+  },
+  tas: {
+    type: [Schema.Types.ObjectId],
+    ref: 'User',
+    default: null
+  },
+  students: {
+    type: [Schema.Types.ObjectId],
+    ref: 'User',
     default: null
   },
   date: {
@@ -38,4 +35,4 @@ const UserSchema = new Schema({
     default: Date.now
   }
 });
-module.exports = User = mongoose.model("users", UserSchema);
+module.exports = Course = mongoose.model("courses", CourseSchema);
