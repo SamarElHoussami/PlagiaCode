@@ -1,3 +1,8 @@
 .formContainer {
     padding-top: 20vh;
 }
+
+.changeAuth {
+    text-align: center;
+    padding-top: 10vh;
+}

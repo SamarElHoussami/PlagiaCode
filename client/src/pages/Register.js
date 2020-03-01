@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styles from '../styles/registerStyle.module.css';
-import { withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 /* Import Components */
 import Input from '../components/Input';  
@@ -66,7 +66,8 @@ class Register extends Component {
       else {
         response.json().then(data => {
           console.log("Successful " + JSON.stringify(data));
-          this.props.history.push('/');
+          this.props.handleLogin(data); //send data back to parent
+          this.props.history.push('/dashboard');
         })
       }
       }).catch(err => {
@@ -106,14 +107,14 @@ class Register extends Component {
             placeholder={"Enter your email"}
             handleChange={this.handleInput}/> {/* Email of user */}
 
-          <Input type={"text"}
+          <Input type={"password"}
             title={"Password"}
             name={"password"}
             value={this.state.newUser.password}
             placeholder={"Create a password"}
             handleChange={this.handleInput}/> {/* Password of user */}
 
-          <Input type={"text"}
+          <Input type={"password"}
             title={"Re-enter Password"}
             name={"password2"}
             value={this.state.newUser.password2}
@@ -143,13 +144,17 @@ class Register extends Component {
           />{" "}
           {/* Clear the form */}
         </form>
+
+        <div className={styles.changeAuth}>
+          <Link to="/login">Already have an account? Login!</Link>
+        </div>
       </div>
     );
   }
 }
 
 const buttonStyle = {
-  margin: "10px 10px 10px 10px"
+  margin: "10px 10px 10px 0px"
 };
 
 export default Register
