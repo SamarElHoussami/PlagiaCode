@@ -1,6 +1,6 @@
 ## Project description
 
-PlagiaCode is a web application designed to allow professors to check for plagiarism in source code files. 
+PlagiaCode is a web application designed to allow professors to check for plagiarism in source code files. <br/> 
 Features include:
 
 ### `creating student or teacher account`
@@ -9,8 +9,8 @@ Each type of user has specific features
 
 ### `adding a course`
 
-For teachers: these are courses they teach
-For students: these are courses they are enrolled in
+For teachers: these are courses they teach<br/> 
+For students: these are courses they are enrolled in<br/> 
 
 ### `adding/uploading an assignment`
 
