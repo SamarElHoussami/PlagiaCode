@@ -15,7 +15,7 @@ const CourseSchema = new Schema({
     ref: 'User',
     required: true
   },
-  assignments: {
+  postings: {
     type: [Schema.Types.ObjectId],
     ref: 'Posting',
     default: null
