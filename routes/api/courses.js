@@ -1,4 +1,5 @@
 const express = require("express");
+var bodyParser = require('body-parser');
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -13,7 +14,7 @@ const Posting = require("../../models/Posting")
 // @route GET api/courses/{code}
 // @desc Get course from course code
 // @access Public
-router.get("/:code", (req, res) => {
+/*router.get("/:code", (req, res) => {
     
     const { courseCode } = req.params;
     
@@ -25,6 +26,56 @@ router.get("/:code", (req, res) => {
             return res.status(400).json({ error: "Course does not exist" });
         }
     }).catch(err => console.log(err));
+});*/
+
+//read array
+/*router.post("/my-array", async (req, res) => {
+    
+    console.log(req.body.array);
+    console.log(JSON.stringify(req.body));
+    let arr = req.body.array;
+    console.log(arr);
+    const newArr = new Array();
+
+    for (const e of arr) {
+        console.log("element: " + e);
+        newArr.push(e);
+    }
+    
+    //console.log("names: "+courseNames);
+    return res.json(newArr);    
+});*/
+
+// @route POST api/courses/my-courses
+// @desc Get course names from course codes
+// @access Public
+router.post("/my-courses", async (req, res) => {
+    
+    console.log(JSON.stringify(req.body));
+    let courseIds = new Array();
+
+    //if there's only one course, make it so you don't iterate through course id string
+    if(req.body.courses.length > 5) {
+        courseIds.push(req.body.courses);
+    } else {
+        courseIds = req.body.courses;
+    }
+    
+    const courseNames = new Array();
+
+    for (var i = 0; i < courseIds.length; i++) {
+        console.log("ID: " + courseIds[i]);
+        await Course.findById( courseIds[i] ).then(course => {
+            if (course) {
+                courseNames.push(course.name);
+            } else {
+                courseNames.push("invalid");
+            }
+        }).catch(err => console.log(err));
+    };
+    
+    //console.log("names: "+courseNames);
+    return res.json(courseNames);    
 });
 
 // @route POST api/courses/new

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import { Route, BrowserRouter as Router, Switch} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../App.css';
@@ -6,6 +6,8 @@ import Login from './Login';
 import Register from './Register';
 import Dashboard from './Dashboard';
 import Home from './Home';
+import Courses from './Courses';
+
 
 class Routing extends React.Component {
   constructor(props) {
@@ -31,13 +33,24 @@ class Routing extends React.Component {
                   {...props}
                   handleLogin={this.props.handleLogin}
                   handleLogout={this.props.handleLogout}
-                  loggedInStatus={this.props.state.loggedInStatus}
+                  loggedInStatus={this.props.loggedInStatus}
                 />
             )}/>
 
             <Route exact path="/dashboard" render={props => (
                 <Dashboard
                   {...props}
+                  handleUpdate={this.props.handleUpdate}
+                  handleLogin={this.props.handleLogin}
+                  handleLogout={this.props.handleLogout}
+                  loggedInStatus={this.props.loggedInStatus}
+                />
+            )}/>
+
+            <Route exact path="/courses" render={props => (
+                <Dashboard
+                  {...props}
+                  handleUpdate={this.props.handleUpdate}
                   handleLogin={this.props.handleLogin}
                   handleLogout={this.props.handleLogout}
                   loggedInStatus={this.props.loggedInStatus}
