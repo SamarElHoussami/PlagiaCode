@@ -108,6 +108,46 @@ router.post("/new", (req, res) => {
     });
 });
 
+// @route GET api/courses/all
+// @desc Get all courses
+// @access Public
+router.get("/all", async (req, res) => {
+    try {
+        console.log("finding all courses");
+        const courses = await Course.find();
+        res.send(courses);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route POST api/courses/add
+// @desc Add new course
+// @access Public
+router.post("/add", (req, res) => {
+    console.log(JSON.stringify(req.body))
+    Course.findOne({ name: req.body.name }).then(course => {
+        
+        if (!course) {
+            return res.status(400).json({error: "Course not found"});
+        } else {
+            course.students.push(req.body.user._id);
+            course.save()
+            .then(course => {
+                User.findById(req.body.user).then(user => {
+                    user.courses.push(course._id);
+                    user.save();
+                    res.json({course: course, user: user});
+                })
+            })
+            .catch(err => console.log(err));
+        }
+
+        return res;
+    });
+});
+
 // @route POST api/courses/{code}/new-post
 // @desc Create new post in course
 // @access Public

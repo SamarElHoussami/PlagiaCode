@@ -19,45 +19,8 @@ class Dashboard extends Component {
 
         console.log(this.state.user);
 
-        this.getCourses = this.getCourses.bind(this);
-        //this.getTaCourses = this.getTaCourses.bind(this);
         this.renderMyClasses = this.renderMyClasses.bind(this);
         this.renderMyTaClasses = this.renderMyTaClasses.bind(this);
-    }
-
-    componentWillMount() {
-        this.getCourses();
-    }
-
-    //ToDo: send array of course ids, get array of course objects
-    getCourses() {
-        let userCourses = {
-            courses: this.state.user.courses
-        }
-        console.log("before api request " + JSON.stringify(userCourses));
-        fetch('http://localhost:5000/api/courses/my-courses', {
-            method: "POST",
-            body: JSON.stringify(userCourses),
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            }
-        }).then(response => {
-            if(!response.ok) {
-                console.log("AFTER API CALL FOR COURSES: " + response.data);
-                return false;
-            } else {
-                response.json().then(data => {
-                    console.log("Successful" + JSON.stringify(data));
-                    this.setState({
-                        courses: data
-                    })
-                })
-                return true;
-            }
-        }).catch(err => {
-            console.log('caught it!',err);
-        });
     }
 
     renderMyClasses() {
@@ -66,9 +29,8 @@ class Dashboard extends Component {
                 return (
                     <Row xs={12}>
                         <Col xs={12} md={6}>
-                            <h3>My classes</h3> 
                             {console.log(this.state)}
-                            <ListBox list={this.state.courses}/>
+                            <ListBox type="courses" handleUpdate={this.props.handleUpdate}/>
                         </Col>
                         {this.renderMyTaClasses}
                     </Row>
@@ -88,7 +50,7 @@ class Dashboard extends Component {
             return (
                 <Col xs={12} md={6}>
                     <h3>Classes I TA:</h3>
-                        <ListBox list={this.state.user.ta}/>
+                        <ListBox type="ta" handleUpdate={this.props.handleUpdate}/>
                 </Col>
             )
         } else {
