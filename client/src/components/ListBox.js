@@ -1,15 +1,18 @@
 import React, {Fragment} from "react";
 import { Button, Modal } from 'react-bootstrap';
+import { withRouter } from 'react-router-dom';
 
 class ListBox extends React.Component {
     constructor(props) {
         super(props);
 
+        console.log(JSON.stringify(props));
         this.state = {
             user: JSON.parse(localStorage.getItem('user')),
             type: props.type,
             list: props.type === "courses" ? JSON.parse(localStorage.getItem('user')).courses : JSON.parse(localStorage.getItem('user')).ta, //course IDs
-            courses: null, //course names
+            myCourseNames: null, //course names
+            allCourses: null,
             show: false,
             courseOpts: null,
             selectValue: 0
@@ -21,6 +24,7 @@ class ListBox extends React.Component {
         this.handleChange = this.handleChange.bind(this);
         this.renderOpts = this.renderOpts.bind(this);
         this.handleAdd = this.handleAdd.bind(this);
+        this.getCourseFromName = this.getCourseFromName.bind(this);
 
     }
 
@@ -59,7 +63,7 @@ class ListBox extends React.Component {
                 response.json().then(data => {
                     console.log("Successful" + JSON.stringify(data));
                     this.setState({
-                        courses: data
+                        myCourseNames: data
                     })
                 })
                 return true;
@@ -71,13 +75,35 @@ class ListBox extends React.Component {
 
     renderList() {
         let listItems = null;
-        if(this.state.courses !== null && this.state.courses != undefined) {
-            return listItems = this.state.courses.map((list) => 
-                <li key={list}>{list}</li>
+        if(this.state.myCourseNames !== null && this.state.myCourseNames != undefined) {
+            return listItems = this.state.myCourseNames.map((courseName) => 
+                <li key={courseName}>
+                    <a onClick={event => {
+                        var courseObj = this.getCourseFromName(courseName);
+                        this.props.history.push({
+                            pathname: `/courses/${courseName}`,
+                            state: { 
+                                courseName: courseName, //send course object as prop
+                                course: courseObj
+                            }
+                        });
+                    }}>{courseName}</a></li>
             )
         } else {
-            return listItems = "none ";
+            return listItems = "No Courses Yet! Add a course! ";
         }
+    }
+
+    getCourseFromName(name) {
+        for(var course in this.state.allCourses) {
+            console.log(JSON.stringify(this.state.allCourses[course]) + " in courses " + name);
+            if(this.state.allCourses[course].name == name) {
+                console.log(JSON.stringify(this.state.allCourses[course]) + " matched");
+                return this.state.allCourses[course];
+            }
+        }
+
+        return null;
     }
 
     handleShow() {
@@ -107,6 +133,8 @@ class ListBox extends React.Component {
                     console.log("Successful" + JSON.stringify(data));
 
                     var listOpts = [];
+                    var courseObj = [];
+
                     if(data.length === 0) {
                         this.setState({
                             courseOpts: <option key={0} value={0}>No courses available</option>
@@ -120,10 +148,12 @@ class ListBox extends React.Component {
                     for(var i in data) {
                         console.log("course in data: " + JSON.stringify(data[i].name))
                         listOpts.push(<option key={data[i]._id} value={data[i].name}>{data[i].name}</option>);
+                        courseObj.push(data[i]);      
                     }
 
                     this.setState({
-                            courseOpts: listOpts
+                            courseOpts: listOpts,
+                            allCourses: courseObj
                     });
                 })
             }
@@ -133,7 +163,7 @@ class ListBox extends React.Component {
     }
 
     handleAdd() {
-        if(!this.state.courses.includes(this.state.selectValue)) {
+        if(!this.state.courseNames.includes(this.state.selectValue)) {
         let addedCourse = {
             name: this.state.selectValue,
             user: this.state.user
@@ -205,4 +235,4 @@ class ListBox extends React.Component {
     }
 }
 
-export default ListBox;
+export default withRouter(ListBox);

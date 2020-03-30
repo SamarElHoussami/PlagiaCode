@@ -108,4 +108,37 @@ router.post("/login", (req, res) => {
     });
 });
 
+// @route GET api/users/find
+// @desc Get user by ID or list of IDs
+// @access Public
+router.post("/find-user", async (req, res) => {
+     
+    console.log(JSON.stringify(req.body));
+    let user_ids = new Array();
+
+    //if there's only one user, make it so you don't iterate through user id string
+    if(req.body.user_ids> 5) {
+        user_ids.push(req.body.user_ids);
+    } else {
+        user_ids = req.body.user_ids;
+    }
+    
+    const users = new Array();
+
+    for (var i = 0; i < user_ids.length; i++) {
+        console.log("ID: " + user_ids[i]);
+        await User.findById( user_ids[i] ).then(user => {
+            if (user) {
+                users.push(user);
+            } else {
+                users.push("invalid");
+            }
+        }).catch(err => console.log(err));
+    };
+    
+    //console.log("names: "+courseNames);
+    return res.json(users);    
+});
+
+
 module.exports = router;

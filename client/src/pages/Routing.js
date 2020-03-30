@@ -7,6 +7,7 @@ import Register from './Register';
 import Dashboard from './Dashboard';
 import Home from './Home';
 import Courses from './Courses';
+import CoursePage from './CoursePage';
 
 
 class Routing extends React.Component {
@@ -48,7 +49,17 @@ class Routing extends React.Component {
             )}/>
 
             <Route exact path="/courses" render={props => (
-                <Dashboard
+                <Courses
+                  {...props}
+                  handleUpdate={this.props.handleUpdate}
+                  handleLogin={this.props.handleLogin}
+                  handleLogout={this.props.handleLogout}
+                  loggedInStatus={this.props.loggedInStatus}
+                />
+            )}/>
+
+            <Route exact path="/courses/:name" render={props => (
+                <CoursePage
                   {...props}
                   handleUpdate={this.props.handleUpdate}
                   handleLogin={this.props.handleLogin}
