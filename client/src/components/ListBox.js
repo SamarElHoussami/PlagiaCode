@@ -14,16 +14,26 @@ class ListBox extends React.Component {
             myCourseNames: null, //course names
             allCourses: null,
             show: false,
+            modalFor: null,
             courseOpts: null,
-            selectValue: 0
+            selectValue: 0,
+            allStudents: null,
+            studentOpts: null,
+            loading: 0,
+            courseName: '',
+            courseCode: '',
+            courseTa: 0
         }
 
         this.getCourses = this.getCourses.bind(this);
-        this.handleShow = this.handleShow.bind(this);
+        this.getStudents = this.getStudents.bind(this);
+        this.handleShowStudent = this.handleShowStudent.bind(this);
+        this.handleShowTeacher = this.handleShowTeacher.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.renderOpts = this.renderOpts.bind(this);
         this.handleAdd = this.handleAdd.bind(this);
+        this.handleCreate = this.handleCreate.bind(this);
         this.getCourseFromName = this.getCourseFromName.bind(this);
 
     }
@@ -31,6 +41,7 @@ class ListBox extends React.Component {
     componentWillMount() {
         this.getCourses(); 
         this.renderOpts();
+        this.getStudents();
     }
     /*const type = props.type; //either course, user, or posting
     TODO: display title, list of links depending on type of list
@@ -63,7 +74,8 @@ class ListBox extends React.Component {
                 response.json().then(data => {
                     console.log("Successful" + JSON.stringify(data));
                     this.setState({
-                        myCourseNames: data
+                        myCourseNames: data,
+                        loading: this.state.loading + 1
                     })
                 })
                 return true;
@@ -106,16 +118,72 @@ class ListBox extends React.Component {
         return null;
     }
 
-    handleShow() {
+    handleShowStudent() {
         this.setState({
-            show: true
+            show: true,
+            modalFor: "student"
+        })
+    }
+
+    handleShowTeacher() {
+        this.setState({
+            show: true,
+            modalFor: "teacher"
         })
     }
 
     handleClose() {
         this.setState({
-            show: false
+            show: false,
+            modalFor: null
         })
+    }
+
+    getStudents() {
+        fetch('http://localhost:5000/api/users/students', {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            if(!response.ok) {
+                console.log("AFTER API CALL FOR COURSES: " + response.data);
+                return false;
+            } else {
+                response.json().then(data => {
+                    console.log("Successful" + JSON.stringify(data));
+                    
+                    var studentOpts = [];
+                    var studentObj = [];
+
+                    if(data.length === 0) {
+                        this.setState({
+                            studentOpts: <option key={0} value={0}>No students available</option>
+                        });
+                        return;
+
+                    } else {
+                        studentOpts.push(<option key={0} value={0}>Select a student</option>);
+                    }
+
+                    for(var i in data) {
+                        console.log("students in data: " + JSON.stringify(data[i].name))
+                        studentOpts.push(<option key={data[i]._id} value={data[i].name}>{data[i].name}</option>);
+                        studentObj.push(data[i]);      
+                    }
+
+                    this.setState({
+                            studentOpts: studentOpts,
+                            allStudents: studentObj,
+                            loading: this.state.loading + 1
+                    });
+                })
+                return true;
+            }
+        }).catch(err => {
+            console.log('caught it!',err);
+        });
     }
 
     renderOpts() {
@@ -153,7 +221,8 @@ class ListBox extends React.Component {
 
                     this.setState({
                             courseOpts: listOpts,
-                            allCourses: courseObj
+                            allCourses: courseObj,
+                            loading: this.state.loading + 1
                     });
                 })
             }
@@ -163,7 +232,7 @@ class ListBox extends React.Component {
     }
 
     handleAdd() {
-        if(!this.state.courseNames.includes(this.state.selectValue)) {
+        if(!this.state.courseNames.includes(this.state.selectValue) && this.state.selectValue !== 0) {
         let addedCourse = {
             name: this.state.selectValue,
             user: this.state.user
@@ -196,42 +265,84 @@ class ListBox extends React.Component {
     }
 
     handleChange(e){
-        this.setState({selectValue:e.target.value});
+        let name = e.target.name;
+        let value = e.target.value;
+
+        this.setState({ [name]: value });
     }
     
+    handleCreate() {
+        alert("created course")
+        this.handleClose();
+    }
+
     render() {
-        return (
-            <Fragment>  
-            {console.log("rendering now " + JSON.stringify(this.state))}
+        if(this.state.loading === 3) {
+            return (
+                <Fragment>  
+                {console.log("rendering now " + JSON.stringify(this.state))}
 
-                <Button variant="primary" onClick={this.handleShow}>
-                    Add course
-                </Button>
-                {this.state.type === "courses" ? "My courses: " : "Courses I TA"}
-                
-                <ul>{this.renderList()}</ul>
-
-                <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={this.state.show} onHide={this.handleClose}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Select course</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body className="text-center">
-                        <select value={this.state.selectValue} onChange={this.handleChange} id='select1'>
-                            {this.state.courseOpts}
-                        </select>
-                    </Modal.Body>
+                    <Button variant="primary" onClick={this.state.user.type=="student" ? this.handleShowStudent : this.handleShowTeacher}>
+                        Add course
+                    </Button>
+                    {this.state.type === "courses" ? "My courses: " : "Courses I TA"}
                     
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={this.handleClose}>
-                            Close
-                        </Button>
-                        <Button variant="primary" onClick={this.handleAdd}>
-                            Add
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
-            </Fragment>
-        )
+                    <ul>{this.renderList()}</ul>
+
+                    <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={this.state.show && this.state.modalFor=="student"} onHide={this.handleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Select course</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body className="text-center">
+                            <select name="selectValue" value={this.state.selectValue} onChange={this.handleChange} id='select1'>
+                                {this.state.courseOpts}
+                            </select>
+                        </Modal.Body>
+                        
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={this.handleClose}>
+                                Close
+                            </Button>
+                            <Button variant="primary" onClick={this.handleAdd}>
+                                Add
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+
+                    <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={this.state.show && this.state.modalFor=="teacher"} onHide={this.handleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Create a new course</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body className="text-center">
+                            <form>
+                                <label>Course name: </label>
+                                <input name="courseName" value={this.state.courseName} onChange={this.handleChange}/>
+                                <br/>
+                                <label>Course code: </label>
+                                <input name="courseCode" value={this.state.courseCode} onChange={this.handleChange}/>
+                                <br/>
+                                <label>Add a TA (optional): </label>
+                                 <select name="courseTa" value={this.state.courseTa} onChange={this.handleChange} id='select2'>
+                                    {this.state.studentOpts}
+                                </select>
+                            </form>
+                        </Modal.Body>
+                        
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={this.handleClose}>
+                                Close
+                            </Button>
+                            <Button variant="primary" onClick={this.handleCreate}>
+                                Add
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                </Fragment>
+            )} else {
+            return (
+                <h1>Loading...</h1>
+            )
+        }
     }
 }
 

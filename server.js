@@ -5,7 +5,7 @@ const passport = require("passport");
 const users = require("./routes/api/users");
 const courses = require("./routes/api/courses");
 const postings = require("./routes/api/postings");
-
+var multer = require('multer');
 
 const app = express();
 

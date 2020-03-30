@@ -50,7 +50,10 @@ class Dashboard extends Component {
             )
         } else {
             return (
+                <Fragment>
                 <h1>You have no courses yet!</h1>
+                <ListBox type="courses" handleUpdate={this.props.handleUpdate}/>
+                </Fragment>
             )
         }
     } 

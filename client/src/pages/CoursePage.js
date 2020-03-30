@@ -1,19 +1,24 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import { withRouter } from 'react-router-dom';
+import { Button, Modal, Container, Row, Col } from 'react-bootstrap';
+import axios from 'axios';
 
 class CoursePage extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            user: null,
+            user: JSON.parse(localStorage.getItem('user')),
             courseName: props.history.location.state === undefined ? null : props.history.location.state.courseName,
             course: props.history.location.state === undefined ? null : props.history.location.state.course,
             teacher: null,
             postings: null,
             tas: null,
             loading: 0,
-            show: false
+            show: false,
+            modalFor: null,
+            selectId: null,
+            selectedFile: null
         }
 
         this.getTeacher = this.getTeacher.bind(this);
@@ -21,6 +26,11 @@ class CoursePage extends React.Component {
         this.getStudents = this.getStudents.bind(this);
         this.getTas = this.getTas.bind(this);
         this.renderNames = this.renderNames.bind(this);
+        this.renderModalBody = this.renderModalBody.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+        this.fileInput = React.createRef();
+        this.onChangeHandler = this.onChangeHandler.bind(this);
 
         console.log("from courses page: " + JSON.stringify(this.state.course.teacher));
     }
@@ -188,17 +198,85 @@ class CoursePage extends React.Component {
         }
     }
 
+    renderModalBody() {
+        console.log("first", this.state.selectId);
+        let curPosting = null;
+        for (let i in this.state.postings) {
+            if(this.state.postings[i]._id == this.state.selectId) {
+                curPosting = this.state.postings[i];
+                console.log(this.state.postings[i]);
+                break;
+            }
+        }
+
+        return (
+            <Col>
+                <Row>
+                    <h3>Posting name:</h3>
+                    <p>{curPosting.name}</p>
+                </Row>
+                <Row>
+                    <h3>Posting description:</h3>
+                    <p>{curPosting.description}</p>
+                </Row>
+                <Row>
+                    <h3>Posting due date:</h3>
+                    <p>{curPosting.due_date}</p>
+                </Row>
+                <Row>
+                    <h3>Submit assignment:</h3>
+                    <form onSubmit={this.handleSubmit}>
+                        <label>
+                        Upload file:
+                        <input type="file" name="file" onChange={this.onChangeHandler} ref={this.fileInput} />
+                        </label>
+                        <br />
+                        <button type="submit">Submit</button>
+                    </form>
+                </Row>
+            </Col>
+        );
+    }
+
+    onChangeHandler(event) {
+        this.setState({
+            selectedFile: event.target.files[0],
+            loaded: 0,
+        })
+    }
+
+    handleSubmit(event) {
+        event.preventDefault();
+        alert(
+            this.fileInput.current.files[0].name
+        );
+
+        const data = new FormData()
+        data.append('file', this.state.selectedFile);
+        data.append('student_id', this.state.user._id);
+        data.append('student_name', this.state.user.name);
+        data.append('posting_id', this.state.selectId);
+
+        console.log(data);
+
+        axios.post("http://localhost:5000/api/postings/submit", data, { 
+        })
+        .then(res => { 
+            console.log(res.statusText)
+        })
+    }
+
     renderNames(object) {
         let listItems = null;
         if(this.state[object] !== null && this.state[object] != undefined) {
             return listItems = this.state[object].map((item) => 
-            console.log(item._id);
                 <li key={item._id}>
                     <a onClick={event => {
                         this.setState({
                             show: true,
-                            modalFor: [object]
-                        });
+                            modalFor: object,
+                            selectId: item._id
+                        })
                     }}>{item.name}</a></li>
             )
         } else {
@@ -206,17 +284,43 @@ class CoursePage extends React.Component {
         }
     }
 
+    handleClose() {
+        this.setState({
+            show: false,
+            modalFor: null,
+            selectId: null
+        })
+    }
+
     render() {
         if(this.state.course !== null && this.state.loading == 4) {
             return (
-                <div>
-                    <h1>Course: {this.state.courseName}</h1>
-                    <h1>Course Code: {this.state.course.code}</h1>
-                    <h1>Teacher: {this.state.teacher.name}</h1>
-                    <h1>Postings: <br/><ul>{this.renderNames("postings")}</ul></h1>
-                    <h1>Students: <br/><ul>{this.renderNames("students")}</ul></h1>
-                    <h1>Tas: <br/><ul>{this.renderNames("tas")}</ul></h1>
-                </div>    
+                <Fragment>
+                    <div>
+                        <h1>Course: {this.state.courseName}</h1>
+                        <h1>Course Code: {this.state.course.code}</h1>
+                        <h1>Teacher: {this.state.teacher.name}</h1>
+                        <h1>Postings: <br/><ul>{this.renderNames("postings")}</ul></h1>
+                        <h1>Students: <br/><ul>{this.renderNames("students")}</ul></h1>
+                        <h1>Tas: <br/><ul>{this.renderNames("tas")}</ul></h1>
+                    </div>    
+
+                     <Modal size="lg" aria-labelledby="contained-modal-title-vcenter" centered show={this.state.show && this.state.modalFor === "postings"} onHide={this.handleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Posting details</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body className="text-center">
+                            {this.state.show && this.renderModalBody()}
+                        </Modal.Body>
+                        
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={this.handleClose}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+
+                </Fragment>
             );
         } else if(this.state.course === null) {
             return (

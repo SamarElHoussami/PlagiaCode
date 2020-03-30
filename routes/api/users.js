@@ -140,5 +140,13 @@ router.post("/find-user", async (req, res) => {
     return res.json(users);    
 });
 
+// @route GET api/users/find
+// @desc Get all users of type student
+// @access Public
+router.get("/students", async (req, res) => {
+     
+    let students = await User.find({ type: "student" }).catch(err => {return res.json("error getting all students")})
+    return res.json(students);    
+});
 
 module.exports = router;

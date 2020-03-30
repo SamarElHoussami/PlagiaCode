@@ -6,20 +6,23 @@ const AssignmentSchema = new Schema({
     type: String,
     required: true
   },
-  student: {
-    type: [Schema.Types.ObjectId],
+  studentId: {
+    type: Schema.Types.ObjectId,
     ref: 'User',
     default: null
   },
-  course: {
-    type: Schema.Types.ObjectId,
-    ref: 'Course',
+  studentName: {
+    type: String,
     required: true
   },
-  file: {
-     data: Buffer, 
-     contentType: String
-  }
+  posting: {
+    type: Schema.Types.ObjectId,
+    ref: 'Posting'
+  },
+  filePath: {
+     type: String,
+     required: true
+  },
   grade: {
     type: Number,
     min: 0,
