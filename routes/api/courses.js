@@ -11,14 +11,14 @@ const Course = require("../../models/Course");
 const User = require("../../models/User");
 const Posting = require("../../models/Posting")
 
-// @route GET api/courses/{code}
-// @desc Get course from course code
+// @route GET api/courses/find
+// @desc Find course from course id
 // @access Public
-/*router.get("/:code", (req, res) => {
+router.post("/find", (req, res) => {
     
-    const { courseCode } = req.params;
+    const courseId = req.body.id;
     
-    Course.findOne({ courseCode }).then(course => {
+    Course.findById( courseId ).then(course => {
         
         if (course) {
             return res.json(course);
@@ -26,7 +26,7 @@ const Posting = require("../../models/Posting")
             return res.status(400).json({ error: "Course does not exist" });
         }
     }).catch(err => console.log(err));
-});*/
+});
 
 //read array
 /*router.post("/my-array", async (req, res) => {

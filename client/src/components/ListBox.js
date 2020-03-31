@@ -98,7 +98,7 @@ class ListBox extends React.Component {
                             pathname: `/courses/${courseName}`,
                             state: { 
                                 courseName: courseName, //send course object as prop
-                                course: courseObj
+                                courseId: courseObj._id
                             }
                         });
                     }}>{courseName}</a></li>

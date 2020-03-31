@@ -132,5 +132,37 @@ router.post("/submit", async (req, res) => {
     })
 });
 
+// @route POST api/postings/new
+// @desc Create new post
+// @access Public
+router.post("/new", (req, res) => {
+    console.log("raw",req.body.date);
+    console.log("date", Date(req.body.date));
+    Course.findById(req.body.course).then(course => {
+        
+        if (!course) {
+            return res.status(400).json({error: "Course does not exists"});
+        } else {
+            
+            const newPost = new Posting({
+                name: req.body.name,
+                course: req.body.course,
+                description: req.body.description,
+                due_date: Date(req.body.date)
+            })
+            .save()
+            .then(post => {
+                course.postings.push(post._id);
+                course.save().then(
+                    course => {res.json({course: course, post: post})}
+                );
+                
+            })
+            .catch(err => console.log(err));
+        }
+
+        return res;
+    });
+});
 
 module.exports = router;

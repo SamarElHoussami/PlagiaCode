@@ -2,6 +2,7 @@ import React, {Fragment} from 'react';
 import { withRouter } from 'react-router-dom';
 import { Button, Modal, Container, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
+import DateTimePicker from 'react-datetime-picker';
 
 class CoursePage extends React.Component {
     constructor(props) {
@@ -10,7 +11,8 @@ class CoursePage extends React.Component {
         this.state = {
             user: JSON.parse(localStorage.getItem('user')),
             courseName: props.history.location.state === undefined ? null : props.history.location.state.courseName,
-            course: props.history.location.state === undefined ? null : props.history.location.state.course,
+            courseId: props.history.location.state === undefined ? null : props.history.location.state.courseId,
+            course: null,
             teacher: null,
             postings: null,
             ta: null,
@@ -19,32 +21,84 @@ class CoursePage extends React.Component {
             modalFor: null,
             selectId: null,
             selectedFile: null,
-            students: null
+            students: null,
+            postName: '',
+            postDesc: '',
+            postDate: new Date()
+
         }
 
         this.getTeacher = this.getTeacher.bind(this);
         this.getPostings = this.getPostings.bind(this);
         this.getStudents = this.getStudents.bind(this);
         this.getTa = this.getTa.bind(this);
+        this.getCourse = this.getCourse.bind(this);
         this.renderNames = this.renderNames.bind(this);
         this.renderModalBody = this.renderModalBody.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.fileInput = React.createRef();
         this.onChangeHandler = this.onChangeHandler.bind(this);
-        this.renderCreatePost = this.renderCreatePost.bind(this);
+        this.renderCreatePostButton = this.renderCreatePostButton.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.createPost = this.createPost.bind(this);
+        this.onChangeDate = this.onChangeDate.bind(this);
+        this.setUp = this.setUp.bind(this);
 
-        console.log("from courses page: " + JSON.stringify(this.state.course.teacher));
     }
 
     componentWillMount() {
-        if(this.state.course !== null && this.state.course !== undefined) {
-            this.getTeacher();
-            this.getPostings();
-            this.getStudents();
-            this.getTa();
+        if(this.state.courseId !== null && this.state.courseId !== undefined) {
+            this.getCourse();
         } else {
             console.log("course is null");
+        }
+    }
+
+    setUp() {
+        this.getTeacher();
+        this.getPostings();
+        this.getStudents();
+        this.getTa();
+    }
+
+    getCourse() {
+        if(this.state.courseId !== null) {
+            let course = {
+                id: this.state.courseId
+            }
+        
+            fetch('http://localhost:5000/api/courses/find', {
+                method: "POST",
+                body: JSON.stringify(course),
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
+                }
+            }).then(response => {
+                if(!response.ok) {
+                    console.log("AFTER API CALL FOR COURSES: " + response.data);
+                    return false;
+                } else {
+                    response.json().then(data => {
+                        console.log("Successful" + JSON.stringify(data));
+                        this.setState({
+                            course: data,
+                            loading: this.state.loading + 1
+                        })
+
+                        this.setUp();
+                    })
+                    return true;
+                }
+            }).catch(err => {
+                console.log('caught it!',err);
+            });
+        } else {
+            this.setState({
+                course: "Unassigned",
+                loading: this.state.loading + 1
+            })
         }
     }
 
@@ -86,8 +140,15 @@ class CoursePage extends React.Component {
         }
     }
 
+    handleChange(e){
+        let name = e.target.name;
+        let value = e.target.value;
+
+        this.setState({ [name]: value });
+    }
+
     getPostings() {
-        console.log(this.state.course.postings);
+        console.log("getting posts",this.state.course.postings);
         if(this.state.course.postings !== null) {
             let coursePostings = {
                 posting_ids: this.state.course.postings
@@ -212,33 +273,58 @@ class CoursePage extends React.Component {
             }
         }
 
-        return (
-            <Col>
-                <Row>
-                    <h3>Posting name:</h3>
-                    <p>{curPosting.name}</p>
-                </Row>
-                <Row>
-                    <h3>Posting description:</h3>
-                    <p>{curPosting.description}</p>
-                </Row>
-                <Row>
-                    <h3>Posting due date:</h3>
-                    <p>{curPosting.due_date}</p>
-                </Row>
-                <Row>
-                    <h3>Submit assignment:</h3>
-                    <form onSubmit={this.handleSubmit}>
-                        <label>
-                        Upload file:
-                        <input type="file" name="file" onChange={this.onChangeHandler} ref={this.fileInput} />
-                        </label>
-                        <br />
-                        <button type="submit">Submit</button>
-                    </form>
-                </Row>
-            </Col>
-        );
+        if(this.state.modalFor === "postings") {
+            return (
+                <Col>
+                    <Row>
+                        <h3>Posting name:</h3>
+                        <p>{curPosting.name}</p>
+                    </Row>
+                    <Row>
+                        <h3>Posting description:</h3>
+                        <p>{curPosting.description}</p>
+                    </Row>
+                    <Row>
+                        <h3>Posting due date:</h3>
+                        <p>{curPosting.due_date}</p>
+                    </Row>
+                    {this.state.user.type === "student" ? 
+                    <Row>
+                        <h3>Submit assignment:</h3>
+                        <form onSubmit={this.handleSubmit}>
+                            <label>
+                            Upload file:
+                            <input type="file" name="file" onChange={this.onChangeHandler} ref={this.fileInput} />
+                            </label>
+                            <br />
+                            <button type="submit">Submit</button>
+                        </form>
+                    </Row> 
+                    : null }
+                </Col>
+            );
+        } else {
+            return (
+                <Col>
+                    <Row>
+                        <label>Posting name: </label>
+                        <input type="text" name="postName" value={this.state.postName} onChange={this.handleChange} />
+                    </Row>
+                    <Row>
+                        <label>Posting description: </label>
+                        <input type="text" name="postDesc" value={this.state.postDesc} onChange={this.handleChange} />
+                    </Row>
+                    <Row>
+                        <label>Posting due date:</label>
+                        <DateTimePicker
+                        name="postDate"
+                        onChange={this.onChangeDate}
+                        value={this.state.postDate}
+                        />
+                    </Row>
+                </Col>
+            )
+        }
     }
 
     onChangeHandler(event) {
@@ -270,6 +356,7 @@ class CoursePage extends React.Component {
     }
 
     renderNames(object) {
+        console.log("rendering " + object + ": " +  this.state[object])
         let listItems = null;
         if(this.state[object] !== null && this.state[object] != undefined) {
             return listItems = this.state[object].map((item) => 
@@ -287,7 +374,7 @@ class CoursePage extends React.Component {
         }
     }
 
-    renderCreatePost() {
+    renderCreatePostButton() {
         return (
             <Fragment>
                 <Button onClick={event => {
@@ -308,9 +395,53 @@ class CoursePage extends React.Component {
         })
     }
 
+    createPost() {
+        if(this.state.postName !== '' && this.state.postDesc !== '' && this.state.postDate !== null) {
+            let newPost = {
+                name: this.state.postName,
+                course: this.state.course._id,
+                description: this.state.postDesc,
+                date: this.state.postDate
+            }
+            console.log("before api request " + JSON.stringify(newPost));
+            fetch('http://localhost:5000/api/postings/new', {
+                method: "POST",
+                body: JSON.stringify(newPost),
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
+                }
+            }).then(response => {
+                if(!response.ok) {
+                    console.log("AFTER API CALL FOR COURSES: " + response.data);
+                    return false;
+                } else {
+                    response.json().then(data => {
+                        console.log("Successful" + JSON.stringify(data));
+
+                        var join = this.state.postings.concat(data.post);
+                        this.setState({
+                            course: data.course,
+                            postings: join
+                        })
+
+                        this.handleClose();
+                    })
+                    return true;
+                }
+            }).catch(err => {
+                console.log('caught it!',err);
+            });
+        } else {
+            alert("missing field")
+        }
+    }
+
+    onChangeDate = date => this.setState({ postDate: date })
+    
     render() {
         {console.log("course page: ",JSON.stringify(this.state.loading))}
-        if(this.state.course !== null && this.state.loading == 4) {
+        if(this.state.course !== null && this.state.loading == 5) {
             return (
                 <Fragment>
                     <div>
@@ -322,7 +453,7 @@ class CoursePage extends React.Component {
                         <h1>Ta: <br/><ul>{this.renderNames("ta")}</ul></h1>
                     </div>    
 
-                    {this.state.user.type === "Teacher" ? this.renderCreatePost() : null}
+                    {this.state.user.type === "Teacher" ? this.renderCreatePostButton() : null}
 
                      <Modal size="lg" aria-labelledby="contained-modal-title-vcenter" centered show={this.state.show && this.state.modalFor === "postings"} onHide={this.handleClose}>
                         <Modal.Header closeButton>
@@ -333,6 +464,24 @@ class CoursePage extends React.Component {
                         </Modal.Body>
                         
                         <Modal.Footer>
+                            <Button variant="secondary" onClick={this.handleClose}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+
+                    <Modal size="lg" aria-labelledby="contained-modal-title-vcenter" centered show={this.state.show && this.state.modalFor === "newPost"} onHide={this.handleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Posting details</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body className="text-center">
+                            {this.state.show && this.renderModalBody()}
+                        </Modal.Body>
+                        
+                        <Modal.Footer>
+                            <Button variant="primary" onClick={this.createPost}>
+                                Create
+                            </Button>
                             <Button variant="secondary" onClick={this.handleClose}>
                                 Close
                             </Button>
