@@ -13,24 +13,26 @@ class CoursePage extends React.Component {
             course: props.history.location.state === undefined ? null : props.history.location.state.course,
             teacher: null,
             postings: null,
-            tas: null,
+            ta: null,
             loading: 0,
             show: false,
             modalFor: null,
             selectId: null,
-            selectedFile: null
+            selectedFile: null,
+            students: null
         }
 
         this.getTeacher = this.getTeacher.bind(this);
         this.getPostings = this.getPostings.bind(this);
         this.getStudents = this.getStudents.bind(this);
-        this.getTas = this.getTas.bind(this);
+        this.getTa = this.getTa.bind(this);
         this.renderNames = this.renderNames.bind(this);
         this.renderModalBody = this.renderModalBody.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.fileInput = React.createRef();
         this.onChangeHandler = this.onChangeHandler.bind(this);
+        this.renderCreatePost = this.renderCreatePost.bind(this);
 
         console.log("from courses page: " + JSON.stringify(this.state.course.teacher));
     }
@@ -40,7 +42,7 @@ class CoursePage extends React.Component {
             this.getTeacher();
             this.getPostings();
             this.getStudents();
-            this.getTas();
+            this.getTa();
         } else {
             console.log("course is null");
         }
@@ -85,6 +87,7 @@ class CoursePage extends React.Component {
     }
 
     getPostings() {
+        console.log(this.state.course.postings);
         if(this.state.course.postings !== null) {
             let coursePostings = {
                 posting_ids: this.state.course.postings
@@ -160,10 +163,10 @@ class CoursePage extends React.Component {
         }
     }
 
-    getTas() {
-        if(this.state.course.tas !== null) {
+    getTa() {
+        if(this.state.course.ta !== null) {
             let courseTas = {
-                user_ids: this.state.course.tas
+                user_ids: this.state.course.ta
             }
             console.log("before api request " + JSON.stringify(courseTas));
             fetch('http://localhost:5000/api/users/find-user', {
@@ -181,7 +184,7 @@ class CoursePage extends React.Component {
                     response.json().then(data => {
                         console.log("Successful" + JSON.stringify(data));
                         this.setState({
-                            tas: data,
+                            ta: data,
                             loading: this.state.loading + 1
                         })
                     })
@@ -284,6 +287,19 @@ class CoursePage extends React.Component {
         }
     }
 
+    renderCreatePost() {
+        return (
+            <Fragment>
+                <Button onClick={event => {
+                        this.setState({
+                            show: true,
+                            modalFor: "newPost"
+                        })
+                    }}>Create New Posting</Button>
+            </Fragment>
+        )
+    }
+
     handleClose() {
         this.setState({
             show: false,
@@ -293,6 +309,7 @@ class CoursePage extends React.Component {
     }
 
     render() {
+        {console.log("course page: ",JSON.stringify(this.state.loading))}
         if(this.state.course !== null && this.state.loading == 4) {
             return (
                 <Fragment>
@@ -302,8 +319,10 @@ class CoursePage extends React.Component {
                         <h1>Teacher: {this.state.teacher.name}</h1>
                         <h1>Postings: <br/><ul>{this.renderNames("postings")}</ul></h1>
                         <h1>Students: <br/><ul>{this.renderNames("students")}</ul></h1>
-                        <h1>Tas: <br/><ul>{this.renderNames("tas")}</ul></h1>
+                        <h1>Ta: <br/><ul>{this.renderNames("ta")}</ul></h1>
                     </div>    
+
+                    {this.state.user.type === "Teacher" ? this.renderCreatePost() : null}
 
                      <Modal size="lg" aria-labelledby="contained-modal-title-vcenter" centered show={this.state.show && this.state.modalFor === "postings"} onHide={this.handleClose}>
                         <Modal.Header closeButton>

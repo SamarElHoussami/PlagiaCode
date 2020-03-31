@@ -20,8 +20,8 @@ const CourseSchema = new Schema({
     ref: 'Posting',
     default: null
   },
-  tas: {
-    type: [Schema.Types.ObjectId],
+  ta: {
+    type: Schema.Types.ObjectId,
     ref: 'User',
     default: null
   },

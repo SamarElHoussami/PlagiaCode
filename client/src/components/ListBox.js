@@ -34,7 +34,7 @@ class ListBox extends React.Component {
         this.renderOpts = this.renderOpts.bind(this);
         this.handleAdd = this.handleAdd.bind(this);
         this.handleCreate = this.handleCreate.bind(this);
-        this.getCourseFromName = this.getCourseFromName.bind(this);
+        this.getObjFromName = this.getObjFromName.bind(this);
 
     }
 
@@ -54,6 +54,8 @@ class ListBox extends React.Component {
     for user: shows user info (teacher or student) like courses they're taking and teaching
 
 */
+    // input: course IDs
+    // output: course names
     getCourses() {
         let userCourses = {
             [this.state.type]: this.state.list
@@ -91,7 +93,7 @@ class ListBox extends React.Component {
             return listItems = this.state.myCourseNames.map((courseName) => 
                 <li key={courseName}>
                     <a onClick={event => {
-                        var courseObj = this.getCourseFromName(courseName);
+                        var courseObj = this.getObjFromName(courseName, this.state.allCourses);
                         this.props.history.push({
                             pathname: `/courses/${courseName}`,
                             state: { 
@@ -106,12 +108,11 @@ class ListBox extends React.Component {
         }
     }
 
-    getCourseFromName(name) {
-        for(var course in this.state.allCourses) {
-            console.log(JSON.stringify(this.state.allCourses[course]) + " in courses " + name);
-            if(this.state.allCourses[course].name == name) {
-                console.log(JSON.stringify(this.state.allCourses[course]) + " matched");
-                return this.state.allCourses[course];
+    getObjFromName(name, list) {
+        for(var item in list) {
+            if(list[item].name == name) {
+                console.log(JSON.stringify(list[item]) + " matched");
+                return list[item];
             }
         }
 
@@ -128,7 +129,7 @@ class ListBox extends React.Component {
     handleShowTeacher() {
         this.setState({
             show: true,
-            modalFor: "teacher"
+            modalFor: "Teacher"
         })
     }
 
@@ -232,7 +233,8 @@ class ListBox extends React.Component {
     }
 
     handleAdd() {
-        if(!this.state.courseNames.includes(this.state.selectValue) && this.state.selectValue !== 0) {
+        if(!this.state.myCourseNames.includes(this.state.selectValue) && this.state.selectValue !== 0) {
+       
         let addedCourse = {
             name: this.state.selectValue,
             user: this.state.user
@@ -251,6 +253,12 @@ class ListBox extends React.Component {
             } else {
                 response.json().then(data => {
                     this.props.handleUpdate(data.user);
+                    var joined = this.state.myCourseNames.concat(data.course.name)
+                    
+                    this.setState({
+                        myCourseNames: joined
+                    })
+
                     this.handleClose();
                 })
             }
@@ -272,15 +280,45 @@ class ListBox extends React.Component {
     }
     
     handleCreate() {
-        alert("created course")
-        this.handleClose();
+        let data = {
+            name: this.state.courseName,
+            code: this.state.courseCode,
+            teacher: this.state.user._id,
+            ta: this.state.courseTa !== 0 ? this.getObjFromName(this.state.courseTa, this.state.allStudents)._id : ''
+        }
+         fetch('http://localhost:5000/api/courses/new', {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            if(!response.ok) {
+                console.log("error: " + response.data);
+            } else {
+                response.json().then(data => {
+                    this.props.handleUpdate(data.user);
+                    var joined = this.state.myCourseNames.concat(data.course.name)
+
+                    this.setState({
+                        myCourseNames: joined
+                    })
+                    
+                    this.handleClose();
+                })
+            }
+        }).catch(err => {
+            console.log('caught it!',err);
+        });
+
     }
 
     render() {
+        console.log(this.state.loading);
         if(this.state.loading === 3) {
             return (
                 <Fragment>  
-                {console.log("rendering now " + JSON.stringify(this.state))}
 
                     <Button variant="primary" onClick={this.state.user.type=="student" ? this.handleShowStudent : this.handleShowTeacher}>
                         Add course
@@ -309,7 +347,7 @@ class ListBox extends React.Component {
                         </Modal.Footer>
                     </Modal>
 
-                    <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={this.state.show && this.state.modalFor=="teacher"} onHide={this.handleClose}>
+                    <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={this.state.show && this.state.modalFor=="Teacher"} onHide={this.handleClose}>
                         <Modal.Header closeButton>
                             <Modal.Title>Create a new course</Modal.Title>
                         </Modal.Header>

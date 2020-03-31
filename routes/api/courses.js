@@ -82,6 +82,7 @@ router.post("/my-courses", async (req, res) => {
 // @desc Create new course
 // @access Public
 router.post("/new", (req, res) => {
+    let courseTa = req.body.ta == '' ? null : req.body.ta;
     Course.findOne({ code: req.body.code }).then(course => {
         
         if (course) {
@@ -92,6 +93,7 @@ router.post("/new", (req, res) => {
                 name: req.body.name,
                 code: req.body.code,
                 teacher: req.body.teacher,
+                ta: courseTa
             })
             .save()
             .then(course => {
