@@ -143,7 +143,7 @@ router.post("/find-user", async (req, res) => {
 // @access Public
 router.get("/students", async (req, res) => {
      
-    let students = await User.find({ type: "student" }).catch(err => {return res.json("error getting all students")})
+    let students = await User.find({ type: "Student" }).catch(err => {return res.json("error getting all students")})
     return res.json(students);    
 });
 

@@ -122,7 +122,7 @@ class ListBox extends React.Component {
     handleShowStudent() {
         this.setState({
             show: true,
-            modalFor: "student"
+            modalFor: "Student"
         })
     }
 
@@ -320,14 +320,14 @@ class ListBox extends React.Component {
             return (
                 <Fragment>  
 
-                    <Button variant="primary" onClick={this.state.user.type=="student" ? this.handleShowStudent : this.handleShowTeacher}>
+                    <Button variant="primary" onClick={this.state.user.type=="Student" ? this.handleShowStudent : this.handleShowTeacher}>
                         Add course
                     </Button>
                     {this.state.type === "courses" ? "My courses: " : "Courses I TA"}
                     
                     <ul>{this.renderList()}</ul>
 
-                    <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={this.state.show && this.state.modalFor=="student"} onHide={this.handleClose}>
+                    <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={this.state.show && this.state.modalFor=="Student"} onHide={this.handleClose}>
                         <Modal.Header closeButton>
                             <Modal.Title>Select course</Modal.Title>
                         </Modal.Header>

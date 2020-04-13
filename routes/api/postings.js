@@ -42,11 +42,11 @@ router.get("/find", (req, res) => {
     }).catch(err => console.log(err));
 });
 
-// @route GET api/postings/submissions
+// @route GET api/postings/submissions/:id
 // @desc Get all submissions for posting
 // @access Public
-router.post("/submissions", async (req, res) => {
-    const posting_id = req.body.posting_id;
+router.get("/submissions/:id", async (req, res) => {
+    const posting_id = req.params.id;
     
     let submissions = await Assignment.find({ posting: posting_id }).catch(err => console.log(err));
     //console.log(submissions);
@@ -55,7 +55,7 @@ router.post("/submissions", async (req, res) => {
 
     submissions.forEach(element => {
         //console.log(element.studentName);
-        finalSubmissions.push({ "name": element.studentName, "path": element.filePath, "submitted": element.date});
+        finalSubmissions.push(element);
     });
 
     return res.json(finalSubmissions);
@@ -120,9 +120,18 @@ router.post("/submit", async (req, res) => {
                 studentName: req.body.student_name,
                 posting: req.body.posting_id,
                 filePath: req.file.path
-            })
+            }).save().then(assignment => {
+                    User.findById(req.body.student_id).then(user => {
+                        user.assignments.push(assignment._id);
+                        user.save();
+                    }).catch(err => {console.error(err.message); res.status(500).send("Couldn't find User for assignment")})
 
-            await finalAssignment.save();
+                    Posting.findById(req.body.posting_id).then(posting => {
+                        posting.submissions.push(assignment);
+                        posting.save();
+                    }).catch(err => {console.error(err.message); res.status(500).send("Couldn't find posting for assignment")})
+                }
+            );
             res.send({assignment: finalAssignment, file: req.file});
 
         } catch (err) {

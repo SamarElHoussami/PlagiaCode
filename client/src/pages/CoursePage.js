@@ -24,7 +24,9 @@ class CoursePage extends React.Component {
             students: null,
             postName: '',
             postDesc: '',
-            postDate: new Date()
+            postDate: new Date(),
+            toCompare: [],
+            submissions: null
 
         }
         this.getUser = this.getUser.bind(this);
@@ -42,7 +44,10 @@ class CoursePage extends React.Component {
         this.createPost = this.createPost.bind(this);
         this.onChangeDate = this.onChangeDate.bind(this);
         this.loadPage = this.loadPage.bind(this);
-        this.createSubmitButtons = this.createSubmitButtons.bind(this);
+        this.viewSubmissions = this.viewSubmissions.bind(this);
+        this.getSubmissions = this.getSubmissions.bind(this);
+        this.handleCompare = this.handleCompare.bind(this);
+        this.isLate = this.isLate.bind(this);
 
     }
 
@@ -89,15 +94,48 @@ class CoursePage extends React.Component {
 
     onChangeDate = date => this.setState({ postDate: date })
 
+    handleCompare(event) {
+        let joined = this.state.toCompare.concat(event.name);
+        this.setState({
+            toCompare: joined
+        })
+    }
+
     handleClose() {
         this.setState({
             show: false,
             modalFor: null,
-            selectId: null
+            selectId: null,
+            submissions: null
         })
     }
-    createSubmitButtons() {
+    viewSubmissions(curPosting) {
+        let subs = null;
+        
+        if(this.state.submissions !== null) {
+            {console.log(this.state.submissions)}
+            return subs = this.state.submissions.map((element) => 
+                <div key={element.studentName}>
+                    <p>Student: {element.studentName}<br/>Assignment: <a href={element.filePath}>{element.name}</a></p><br/>
+                    <p>Grade: {element.grade === -1 ? "not graded" : element.grade}</p><br/>
+                    <p>Submitted: {element.date} {this.isLate(element.date, curPosting.due_date)}</p>
+                    <label>
+                        <input
+                            type="checkbox"
+                            name={element.filePath}
+                            onChange={this.handleCompare}
+                        />
+                    </label>
+                    
+                </div>
+            ); 
+        } else { return null}
+    }
 
+    isLate(subDate, dueDate) {
+        return(
+            <b style={{ color:"red" }}>LATE</b>
+        )
     }
 
     renderDetailModal() {
@@ -112,38 +150,38 @@ class CoursePage extends React.Component {
                 }
             }
 
+            if(this.state.user.type == "Teacher" && this.state.submissions === null) this.getSubmissions(curPosting._id);
+
             return (
                 <Modal size="lg" aria-labelledby="contained-modal-title-vcenter" centered show={this.state.show && this.state.modalFor === "postings"} onHide={this.handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>Posting details</Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="text-center">
-                        <Col>
-                            <Row>
-                                <h3>Posting name:</h3>
-                                <p>{curPosting.name}</p>
-                            </Row>
-                            <Row>
-                                <h3>Posting description:</h3>
-                                <p>{curPosting.description}</p>
-                            </Row>
-                            <Row>
-                                <h3>Posting due date:</h3>
-                                <p>{curPosting.due_date}</p>
-                            </Row>
-                            {this.state.user.type === "student" ? 
-                            <Row>
-                                <h3>Submit assignment:</h3>
-                                <form onSubmit={this.handleSubmit}>
-                                    <label>
-                                    Upload file:  
-                                    </label>
-                                    <input type="file" name="file" onChange={this.fileChange} ref={this.fileInput} />
-                                    <button type="submit">Submit</button>
-                                </form>
-                            </Row> 
-                            : null }
-                        </Col>
+                    <div>
+        
+                        <h3>Posting name:</h3><br/>
+                        <p>{curPosting.name}</p><br/>
+        
+                        <h3>Posting description:</h3><br/>
+                        <p>{curPosting.description}</p><br/>
+                    
+                        <h3>Posting due date:</h3><br/>
+                        <p>{curPosting.due_date}</p><br/>
+                        
+                        {this.state.user.type === "Student" ? 
+                            <Fragment>
+                            <h3>Submit assignment:</h3><br/>
+                            <form onSubmit={this.handleSubmit}>
+                                <label>Upload file:  </label>
+                                <input type="file" name="file" onChange={this.fileChange} ref={this.fileInput} />
+                                <button type="submit">Submit</button>
+                            </form><br/>
+                            </Fragment>
+                        : null }
+                        <hr/>
+                        {this.state.user.type === "Teacher" ? this.viewSubmissions(curPosting) : null }
+                    </div>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={this.handleClose}>
@@ -243,7 +281,6 @@ class CoursePage extends React.Component {
                         <h1>Course Code: {this.state.course.code}</h1>
                         <h1>Teacher: {this.renderNames("teacher")}</h1>
                         <h1>Postings: <br/><ul>{this.renderNames("postings")}</ul></h1>
-                        <ul>{this.createSubmitButtons()}</ul>
                         <h1>Students: <br/><ul>{this.renderNames("students")}</ul></h1>
                         <h1>Ta: <br/><ul>{this.renderNames("ta")}</ul></h1>
                     </div>    
@@ -296,9 +333,17 @@ class CoursePage extends React.Component {
 
     //get users from IDs references in this course
     getUser(user) {
+        console.log(this.state.course[user]);
         if(this.state.course[user] !== null) {
-            let list = {
-                user_ids: [this.state.course[user]]
+            let list = null;
+            if(this.state.course[user].length <= 2) {
+                list = {
+                    user_ids: this.state.course[user]
+                }
+            } else {
+                list = {
+                    user_ids: [this.state.course[user]]
+                }
             }
 
             console.log(JSON.stringify(list));
@@ -414,6 +459,28 @@ class CoursePage extends React.Component {
             console.log(res.statusText);
             this.handleClose();
         }).catch(err => alert("An error occured. Please make to select a file before uploading."));
+    }
+
+    //get submissions of course we're trying to load
+    getSubmissions(curPosting) { 
+        console.log(curPosting);
+        return fetch(`http://localhost:5000/api/postings/submissions/${curPosting}`, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            response.json().then(data => {
+                console.log("Successful" + JSON.stringify(data));
+                this.setState({
+                    submissions: data
+                })
+            })
+        }).catch(err => {
+            console.log('caught it!',err);
+            return null;
+        });
     }
 }
 

@@ -25,8 +25,9 @@ const AssignmentSchema = new Schema({
   },
   grade: {
     type: Number,
-    min: 0,
-    max: 100
+    min: -1,
+    max: 100,
+    default: -1 
   },
   date: {
     type: Date,
