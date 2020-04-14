@@ -1,6 +1,10 @@
 import React, {Fragment} from "react";
 import { Button, Modal } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
+import ReactLoading from 'react-loading';
+
+//style import 
+import styles from '../styles/listboxStyle.module.css';
 
 class ListBox extends React.Component {
     constructor(props) {
@@ -91,7 +95,7 @@ class ListBox extends React.Component {
         let listItems = null;
         if(this.state.myCourseNames !== null && this.state.myCourseNames != undefined) {
             return listItems = this.state.myCourseNames.map((courseName) => 
-                <li key={courseName}>
+                <li className={styles.listItem} key={courseName}>
                     <a onClick={event => {
                         var courseObj = this.getObjFromName(courseName, this.state.allCourses);
                         this.props.history.push({
@@ -299,10 +303,12 @@ class ListBox extends React.Component {
             } else {
                 response.json().then(data => {
                     this.props.handleUpdate(data.user);
-                    var joined = this.state.myCourseNames.concat(data.course.name)
+                    var joinedNames = this.state.myCourseNames.concat(data.course.name);
+                    var joinedCourses = this.state.allCourses.concat(data.course);
 
                     this.setState({
-                        myCourseNames: joined
+                        myCourseNames: joinedNames,
+                        allCourses: joinedCourses
                     })
                     
                     this.handleClose();
@@ -320,27 +326,27 @@ class ListBox extends React.Component {
             return (
                 <Fragment>  
 
-                    <Button variant="primary" onClick={this.state.user.type=="Student" ? this.handleShowStudent : this.handleShowTeacher}>
-                        Add course
+                    <h1 className={styles.containerTitle}>{this.state.type === "courses" ? "My courses: " : "Courses I TA"}</h1>
+                    <Button className={styles.addCourseBtn} variant="primary" onClick={this.state.user.type=="Student" ? this.handleShowStudent : this.handleShowTeacher}>
+                        +
                     </Button>
-                    {this.state.type === "courses" ? "My courses: " : "Courses I TA"}
-                    
-                    <ul>{this.renderList()}</ul>
+
+                    <div className={styles.listContainer}>
+                        <ul>{this.renderList()}</ul>
+                    </div>
 
                     <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={this.state.show && this.state.modalFor=="Student"} onHide={this.handleClose}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Select course</Modal.Title>
+                            <Modal.Title className={styles.modalTitle}>Add Course</Modal.Title>
                         </Modal.Header>
-                        <Modal.Body className="text-center">
-                            <select name="selectValue" value={this.state.selectValue} onChange={this.handleChange} id='select1'>
+                        <Modal.Body>
+                            <label className={styles.formLabel}>Select Course* </label>
+                            <select className={styles.inputSelect} name="selectValue" value={this.state.selectValue} onChange={this.handleChange} id='select1'>
                                 {this.state.courseOpts}
                             </select>
                         </Modal.Body>
                         
                         <Modal.Footer>
-                            <Button variant="secondary" onClick={this.handleClose}>
-                                Close
-                            </Button>
                             <Button variant="primary" onClick={this.handleAdd}>
                                 Add
                             </Button>
@@ -349,27 +355,22 @@ class ListBox extends React.Component {
 
                     <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={this.state.show && this.state.modalFor=="Teacher"} onHide={this.handleClose}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Create a new course</Modal.Title>
+                            <Modal.Title className={styles.modalTitle}>Create Course</Modal.Title>
                         </Modal.Header>
-                        <Modal.Body className="text-center">
+                        <Modal.Body>
                             <form>
-                                <label>Course name: </label>
-                                <input name="courseName" value={this.state.courseName} onChange={this.handleChange}/>
+                                <input className={styles.inputText} name="courseName" placeholder="Course Name*" value={this.state.courseName} onChange={this.handleChange}/>
                                 <br/>
-                                <label>Course code: </label>
-                                <input name="courseCode" value={this.state.courseCode} onChange={this.handleChange}/>
+                                <input className={styles.inputText} placeholder="Course Code*" name="courseCode" value={this.state.courseCode} onChange={this.handleChange}/>
                                 <br/>
-                                <label>Add a TA (optional): </label>
-                                 <select name="courseTa" value={this.state.courseTa} onChange={this.handleChange} id='select2'>
+                                <label className={styles.formLabel}>Add a TA (optional): </label>
+                                 <select className={styles.inputSelect} name="courseTa" value={this.state.courseTa} onChange={this.handleChange} id='select2'>
                                     {this.state.studentOpts}
                                 </select>
                             </form>
                         </Modal.Body>
                         
                         <Modal.Footer>
-                            <Button variant="secondary" onClick={this.handleClose}>
-                                Close
-                            </Button>
                             <Button variant="primary" onClick={this.handleCreate}>
                                 Add
                             </Button>
@@ -378,7 +379,9 @@ class ListBox extends React.Component {
                 </Fragment>
             )} else {
             return (
-                <h1>Loading...</h1>
+                <div className={styles.loading}>
+                    <ReactLoading type={"bars"} color={"#333a41"} height={'20%'} width={'20%'} />
+                </div>
             )
         }
     }

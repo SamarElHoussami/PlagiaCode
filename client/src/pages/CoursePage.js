@@ -2,7 +2,11 @@ import React, {Fragment} from 'react';
 import { withRouter } from 'react-router-dom';
 import { Button, Modal, Container, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
+import ReactLoading from 'react-loading';
 import DateTimePicker from 'react-datetime-picker';
+
+//style import 
+import styles from '../styles/coursepageStyle.module.css';
 
 class CoursePage extends React.Component {
     constructor(props) {
@@ -48,6 +52,7 @@ class CoursePage extends React.Component {
         this.getSubmissions = this.getSubmissions.bind(this);
         this.handleCompare = this.handleCompare.bind(this);
         this.isLate = this.isLate.bind(this);
+        this.renderCompareButton = this.renderCompareButton.bind(this);
 
     }
 
@@ -109,6 +114,14 @@ class CoursePage extends React.Component {
             submissions: null
         })
     }
+
+    dateToText(date) {
+        var dateText = date.substring(0, 10);
+        var timeText = date.substring(11, 19);
+
+        return {date: dateText, time: timeText}
+    }
+
     viewSubmissions(curPosting) {
         let subs = null;
         
@@ -116,16 +129,18 @@ class CoursePage extends React.Component {
             {console.log(this.state.submissions)}
             return subs = this.state.submissions.map((element) => 
                 <div key={element.studentName}>
-                    <p>Student: {element.studentName}<br/>Assignment: <a href={element.filePath}>{element.name}</a></p><br/>
-                    <p>Grade: {element.grade === -1 ? "not graded" : element.grade}</p><br/>
-                    <p>Submitted: {element.date} {this.isLate(element.date, curPosting.due_date)}</p>
-                    <label>
+                    <hr className={styles.separator}/>
+                    <p style={{display:"inline"}}><b>Student:</b> {element.studentName}</p>
+                    <label className={styles.studentCheck}>
                         <input
                             type="checkbox"
                             name={element.filePath}
                             onChange={this.handleCompare}
                         />
                     </label>
+                    <p><b>Assignment:</b> <a href={element.filePath}>{element.name}</a></p>
+                    <p><b>Grade:</b> {element.grade === -1 ? "not graded" : element.grade}</p>
+                    <p><b>Submitted:</b> {this.dateToText(element.date).date} {this.dateToText(element.date).time} {this.isLate(element.date, curPosting.due_date)}</p>
                     
                 </div>
             ); 
@@ -136,6 +151,28 @@ class CoursePage extends React.Component {
         return(
             <b style={{ color:"red" }}>LATE</b>
         )
+    }
+
+    renderCompareButton(toCompare) {
+        if(toCompare.length === 2) {
+            return (
+                <Fragment>
+                    <p className={styles.note}>*check 2 students to enable</p>
+                    <Button style={{float:"right"}} variant="primary" onClick={this.handleSubmitCompare}>Check Plagiarism</Button> 
+                </Fragment>
+            );
+        } else {
+            return (
+                <Fragment>
+                    <p className={styles.note}>*check 2 students to enable</p>
+                    <Button style={{float:"right"}} variant="primary" disabled>Check Plagiarism</Button> 
+                </Fragment>
+            );
+        }
+    }
+
+    handleSubmitCompare() {
+
     }
 
     renderDetailModal() {
@@ -155,38 +192,33 @@ class CoursePage extends React.Component {
             return (
                 <Modal size="lg" aria-labelledby="contained-modal-title-vcenter" centered show={this.state.show && this.state.modalFor === "postings"} onHide={this.handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Posting details</Modal.Title>
+                        <Modal.Title className={styles.modalTitle}>Assignment Details</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body className="text-center">
+                    <Modal.Body>
                     <div>
         
-                        <h3>Posting name:</h3><br/>
-                        <p>{curPosting.name}</p><br/>
+                        <p><b>Assignmet Name:</b> {curPosting.name}</p>
         
-                        <h3>Posting description:</h3><br/>
-                        <p>{curPosting.description}</p><br/>
+                        <p><b>Assignment Description:</b><br/>{curPosting.description}</p>
                     
-                        <h3>Posting due date:</h3><br/>
-                        <p>{curPosting.due_date}</p><br/>
+                        <p><b>Assignment Due Date:</b><br/>{this.dateToText(curPosting.due_date).date} {this.dateToText(curPosting.due_date).time}</p>
                         
                         {this.state.user.type === "Student" ? 
                             <Fragment>
-                            <h3>Submit assignment:</h3><br/>
+                            <p><b>Submit Assignment</b></p>
                             <form onSubmit={this.handleSubmit}>
-                                <label>Upload file:  </label>
-                                <input type="file" name="file" onChange={this.fileChange} ref={this.fileInput} />
+                                <label className={styles.formLabel}>Upload file:  </label>
+                                <input className={styles.inputText}type="file" name="file" onChange={this.fileChange} ref={this.fileInput} />
                                 <button type="submit">Submit</button>
                             </form><br/>
                             </Fragment>
                         : null }
                         <hr/>
-                        {this.state.user.type === "Teacher" ? this.viewSubmissions(curPosting) : null }
+                        {this.state.user.type === "Teacher" ? <Fragment><h1 className={styles.modalTitle}>Student Submissions</h1>{this.viewSubmissions(curPosting)}</Fragment> : null }
                     </div>
                     </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={this.handleClose}>
-                            Close
-                        </Button>
+                    <Modal.Footer className={styles.modalFooter}>
+                        {this.state.user.type === "Teacher" ? this.renderCompareButton(this.state.toCompare) : null} 
                     </Modal.Footer>
                 </Modal>
             );
@@ -198,20 +230,18 @@ class CoursePage extends React.Component {
             return(
                 <Modal size="lg" aria-labelledby="contained-modal-title-vcenter" centered show={this.state.show && this.state.modalFor === "newPost"} onHide={this.handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Posting details</Modal.Title>
+                        <Modal.Title className={styles.modalTitle}>Create Assignment</Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="text-center">
                         <Col>
                             <Row>
-                                <label>Posting name: </label>
-                                <input type="text" name="postName" value={this.state.postName} onChange={this.handleChange} />
+                                <input className={styles.inputText} placeholder="Assignment Name*" type="text" name="postName" value={this.state.postName} onChange={this.handleChange} />
                             </Row>
                             <Row>
-                                <label>Posting description: </label>
-                                <input type="text" name="postDesc" value={this.state.postDesc} onChange={this.handleChange} />
+                                <input className={styles.inputText} placeholder="Assignment Description" type="text" name="postDesc" value={this.state.postDesc} onChange={this.handleChange} />
                             </Row>
                             <Row>
-                                <label>Posting due date:</label>
+                                <label className={styles.formLabel}>Assignment Due Date:</label><br/>
                                 <DateTimePicker
                                 name="postDate"
                                 onChange={this.onChangeDate}
@@ -223,9 +253,6 @@ class CoursePage extends React.Component {
                     <Modal.Footer>
                         <Button variant="primary" onClick={this.createPost}>
                             Create
-                        </Button>
-                        <Button variant="secondary" onClick={this.handleClose}>
-                            Close
                         </Button>
                     </Modal.Footer>
                 </Modal>
@@ -255,12 +282,13 @@ class CoursePage extends React.Component {
     renderCreatePostButton() {
         return (
             <Fragment>
-                <Button onClick={event => {
+                <Button className={styles.addBtn}
+                 onClick={event => {
                         this.setState({
                             show: true,
                             modalFor: "newPost"
                         })
-                    }}>Create New Posting</Button>
+                    }}>+</Button>
             </Fragment>
         )
     }
@@ -276,16 +304,28 @@ class CoursePage extends React.Component {
         if(this.state.course !== null && this.state.loading == 5) {
             return (
                 <Fragment>
-                    <div>
-                        <h1>Course: {this.state.courseName}</h1>
-                        <h1>Course Code: {this.state.course.code}</h1>
-                        <h1>Teacher: {this.renderNames("teacher")}</h1>
-                        <h1>Postings: <br/><ul>{this.renderNames("postings")}</ul></h1>
-                        <h1>Students: <br/><ul>{this.renderNames("students")}</ul></h1>
-                        <h1>Ta: <br/><ul>{this.renderNames("ta")}</ul></h1>
-                    </div>    
+                    <Container>
+                        <Row xs={12}>
+                            <h1 className={styles.pageTitle}>Course Info</h1>
+                        </Row>
+                        <hr/>
+                        <Row xs={12}>
+                        <Col xs={6}>
+                        
+                            <p><b>Course Name:</b> {this.state.courseName}</p>
+                            <p><b>Course Code:</b> {this.state.course.code}</p>
+                            <p><b>Teacher:</b></p> {this.renderNames("teacher")}
+                            <p><b>Students:</b></p><ul>{this.renderNames("students")}</ul>
+                            <p><b>Ta:</b></p><ul>{this.renderNames("ta")}</ul>
+                        </Col> 
+                        <Col xs={6}>
+                            <p><b>Assignments:</b> {this.state.user.type === "Teacher" ? this.renderCreatePostButton() : null}</p>
+                            <ul className={styles.listItem}>{this.renderNames("postings")}</ul>
+                        </Col>
+                        </Row>
 
-                    {this.state.user.type === "Teacher" ? this.renderCreatePostButton() : null}
+                    </Container>  
+
                     {this.renderDetailModal()}
                     {this.renderCreateModal()}
 
@@ -293,7 +333,9 @@ class CoursePage extends React.Component {
             );
         } else {
             return (
-                <h1>Loading...</h1>
+                <div className={styles.loading}>
+                    <ReactLoading type={"bars"} color={"#333a41"} height={'20%'} width={'20%'} />
+                </div>
             )
         }
     }

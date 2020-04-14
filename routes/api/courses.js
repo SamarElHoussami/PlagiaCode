@@ -101,7 +101,13 @@ router.post("/new", (req, res) => {
                     user.courses.push(course._id);
                     user.save();
                     res.json({course: course, user: user});
-                })
+                });
+                if(courseTa !== null) {
+                    User.findById(courseTa).then(user => {
+                    user.ta.push(course._id);
+                    user.save();
+                    })
+                }
             })
             .catch(err => console.log(err));
         }

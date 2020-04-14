@@ -1,0 +1,129 @@
+.loading {
+    display: flex;
+    justify-content: center;
+}
+
+.pageTitle {
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    font-weight: bold;
+    display: block;
+    width: 100%;
+    margin: 20px 0 10px 0;
+}
+
+
+.addBtn {
+    border-radius: 50%;
+    font-weight: bold;
+    display: inline;
+    float: right;
+    transform: translateX(16px);
+}
+
+.listContainer {
+    padding: 30px;
+    border: 2px solid #333a41;
+}
+
+.listItem {
+    font-size: 20px;
+}
+
+.listItem a:hover {
+    color: blue !important;
+    cursor: pointer;
+}
+
+p {
+    font-family: 'Lato', sans-serif;
+    font-size: 25px;
+    margin-bottom: 0;
+    margin-top: 1rem;
+}
+
+li {
+    font-family: 'Lato', sans-serif;
+    font-size: 25px;
+    margin: 0;
+}
+
+.modalTitle {
+    width: 100%;
+    font-size: 30px;
+    font-family: 'Lato', sans-serif;
+    color: rgb(72,72,72);
+    font-weight: bold;
+}
+
+.separator {
+    border-top: 1px solid rgba(0, 75, 245, 0.5);
+}
+
+.inputText {
+    font-family: Georgia,"Times New Roman",Times,serif;
+    background: rgba(255,255,255,.1);
+    border: 0;
+    border-radius: 4px;
+    font-size: 15px;
+    margin: 0;
+    outline: 0;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    background-color: #e8eeef;
+    color: #8a97a0;
+    -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
+    margin-bottom: 30px;
+}
+
+.inputText:focus {
+    background: #d2d9dd;
+}
+
+.inputSelect {
+    font-family: Georgia,"Times New Roman",Times,serif;
+    background: rgba(255,255,255,.1);
+    border: 0;
+    border-radius: 4px;
+    font-size: 15px;
+    margin: 0;
+    outline: 0;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    height: 40px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    background-color: #e8eeef;
+    color: #8a97a0;
+    -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
+    margin-bottom: 30px;
+}
+
+.formLabel {
+    color: #484848;
+    text-align: left;
+}
+
+.studentCheck {
+    display: inline;
+    float: left;
+    transform: translateY(5px);
+    margin-right: 10px;
+}
+
+.note {
+    color: rgb(30,30,30);
+    font-size: 13px;
+    text-align: left;
+    display: inline;
+}
+
+.modalFooter {
+    display: block;
+}

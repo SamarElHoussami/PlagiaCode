@@ -6,6 +6,9 @@ import NavBar from '../components/NavBar';
 //bootstrap imports
 import { Container, Row, Col } from 'react-bootstrap';
 
+//style import 
+import styles from '../styles/dashboardStyle.module.css';
+
 class Dashboard extends Component {
     constructor(props) {
         super(props);
@@ -41,7 +44,7 @@ class Dashboard extends Component {
         if(this.state.user.courses.length != 0) {
             return (
                 <Row xs={12}>
-                    <Col xs={12} md={6}>
+                    <Col xs={12}>
                         {console.log(this.state)}
                         <ListBox type="courses" handleUpdate={this.props.handleUpdate}/>
                     </Col>
@@ -61,7 +64,7 @@ class Dashboard extends Component {
     renderMyTaClasses() {
         if(this.state.user.ta.length != 0) {
             return (
-                <Col xs={12} md={6}>
+                <Col xs={12}>
                     <h3>Classes I TA:</h3>
                         <ListBox type="ta" handleUpdate={this.props.handleUpdate}/>
                 </Col>
@@ -92,8 +95,9 @@ class Dashboard extends Component {
             return (
                 <Container>
                     <Row xs={12}>
-                        <h1>Welcome, {this.state.user.name}</h1>
+                        <h1 className={styles.pageTitle}>Dashboard</h1>
                     </Row>
+                    <hr/>
                 {this.renderMyClasses()}    
                 </Container>
             )

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import styles from '../styles/registerStyle.module.css';
 import { Link} from "react-router-dom";
 
@@ -88,6 +88,8 @@ class Login extends Component {
           />
         )} else {
           return (
+            <Fragment>
+            <h1 className={styles.pageTitle}>Login</h1><hr/>
             <div className={styles.formContainer}>
               <form className="container" onSubmit={this.handleFormSubmit}>
 
@@ -119,6 +121,7 @@ class Login extends Component {
                 <Link to="/register">Don't have an account? Register!</Link>
               </div>
             </div>
+            </Fragment>
           );
         }
       }
