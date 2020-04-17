@@ -9,10 +9,27 @@
 }
 
 .pageTitle {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
     text-align: center;
     font-weight: bold;
     display: block;
     width: 100%;
     margin: 20px 0 10px 0;
+}
+
+.inputLabel {
+    display: block;
+    width: 60%;
+    margin: auto;
+}
+
+.textInput {
+    width: 60%;
+    margin: auto;
+}
+
+.btnContainer {
+    display: flex;
+    width: 60%;
+    margin: auto;
 }

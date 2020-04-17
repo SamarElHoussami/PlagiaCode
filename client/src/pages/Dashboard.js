@@ -2,6 +2,8 @@ import React, { Component, Fragment } from 'react';
 //import ErrorPage from './ErrorPage'; //TODO: implement error page
 import ListBox from '../components/ListBox';
 import NavBar from '../components/NavBar';
+import img_teacher from "../images/img_teacher.PNG";
+import img_student from "../images/img_student.PNG";
 
 //bootstrap imports
 import { Container, Row, Col } from 'react-bootstrap';
@@ -32,7 +34,7 @@ class Dashboard extends Component {
         if(this.authenticated()) {
             console.log("is authenticated");
             this.setState({
-                user: JSON.parse(localStorage.getItem('user'))
+                user: JSON.parse(localStorage.getItem('user')),
             })
         } else {
             this.props.history.push("/login");
@@ -48,7 +50,7 @@ class Dashboard extends Component {
                         {console.log(this.state)}
                         <ListBox type="courses" handleUpdate={this.props.handleUpdate}/>
                     </Col>
-                    {this.renderMyTaClasses}
+                    {this.renderMyTaClasses()}
                 </Row>
             )
         } else {
@@ -65,8 +67,7 @@ class Dashboard extends Component {
         if(this.state.user.ta.length != 0) {
             return (
                 <Col xs={12}>
-                    <h3>Classes I TA:</h3>
-                        <ListBox type="ta" handleUpdate={this.props.handleUpdate}/>
+                    <ListBox type="ta" handleUpdate={this.props.handleUpdate}/>
                 </Col>
             )
         } else {
@@ -93,13 +94,18 @@ class Dashboard extends Component {
     render() {
         if(this.authenticated()) {
             return (
-                <Container>
-                    <Row xs={12}>
-                        <h1 className={styles.pageTitle}>Dashboard</h1>
-                    </Row>
-                    <hr/>
-                {this.renderMyClasses()}    
-                </Container>
+                <div>
+                    <div className={styles.bgHeader}>
+                        {this.state.user.type === "Student" ? <img src={img_student} className={styles.profilePic}/> : <img src={img_teacher} className={styles.profilePic}/>}  
+                        <div className={styles.userInfo}>
+                            <h3 className={styles.userName}>{this.state.user.name}</h3>
+                            <h5 className={styles.userType}><b>Type:</b> {this.state.user.type}</h5>
+                        </div>
+                    </div>
+                    <Container>
+                    {this.renderMyClasses()}    
+                    </Container>
+                </div>
             )
         } else return null;
     }

@@ -43,6 +43,7 @@ class ListBox extends React.Component {
     }
 
     componentWillMount() {
+        console.log(this.state.list);
         this.getCourses(); 
         this.renderOpts();
         this.getStudents();
@@ -62,7 +63,7 @@ class ListBox extends React.Component {
     // output: course names
     getCourses() {
         let userCourses = {
-            [this.state.type]: this.state.list
+            "courses": this.state.list
         }
         console.log("before api request " + JSON.stringify(userCourses));
         fetch('http://localhost:5000/api/courses/my-courses', {
@@ -95,8 +96,12 @@ class ListBox extends React.Component {
         let listItems = null;
         if(this.state.myCourseNames !== null && this.state.myCourseNames != undefined) {
             return listItems = this.state.myCourseNames.map((courseName) => 
-                <li className={styles.listItem} key={courseName}>
-                    <a onClick={event => {
+                <a
+                style={{backgroundColor: this.pickColor()}}
+                className={styles.listItem} 
+                key={courseName}
+                name={courseName}
+                onClick={event => {
                         var courseObj = this.getObjFromName(courseName, this.state.allCourses);
                         this.props.history.push({
                             pathname: `/courses/${courseName}`,
@@ -105,10 +110,11 @@ class ListBox extends React.Component {
                                 courseId: courseObj._id
                             }
                         });
-                    }}>{courseName}</a></li>
+                    }}
+                ><p>{courseName}</p></a>
             )
         } else {
-            return listItems = "No Courses Yet! Add a course! ";
+            return listItems = null;
         }
     }
 
@@ -320,6 +326,11 @@ class ListBox extends React.Component {
 
     }
 
+    pickColor() {
+        var opts = ["rgba(27,218,209,0.3)", "rgba(27,112,218,0.3)", "rgba(30,27,218,0.3)","rgba(197,27,218,0.3)", "rgba(218,27,115,0.3)","rgba(218,27,27,0.3)"];
+        return opts[Math.floor((Math.random()*opts.length))];
+    }
+
     render() {
         console.log(this.state.loading);
         if(this.state.loading === 3) {
@@ -327,12 +338,13 @@ class ListBox extends React.Component {
                 <Fragment>  
 
                     <h1 className={styles.containerTitle}>{this.state.type === "courses" ? "My courses: " : "Courses I TA"}</h1>
-                    <Button className={styles.addCourseBtn} variant="primary" onClick={this.state.user.type=="Student" ? this.handleShowStudent : this.handleShowTeacher}>
-                        +
-                    </Button>
+                    
 
                     <div className={styles.listContainer}>
-                        <ul>{this.renderList()}</ul>
+                        {this.state.type == "courses" ? <a className={styles.listItem} onClick={this.state.user.type=="Student"? this.handleShowStudent : this.handleShowTeacher}>
+                        <p>+</p>
+                        </a>: null}
+                        {this.renderList()}
                     </div>
 
                     <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={this.state.show && this.state.modalFor=="Student"} onHide={this.handleClose}>
@@ -385,6 +397,9 @@ class ListBox extends React.Component {
             )
         }
     }
+}
+const randomColor = {
+    backgroundColor: "rgba(" + 177+Math.random()*(255-177)+ ",27,27,0.3)"
 }
 
 export default withRouter(ListBox);

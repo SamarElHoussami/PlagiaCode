@@ -6,6 +6,7 @@ import { Link} from "react-router-dom";
 import Input from '../components/Input';  
 import Button from '../components/Button';
 
+
 class Login extends Component {  
   constructor(props) {
     super(props);
@@ -53,6 +54,7 @@ class Login extends Component {
     }).then(response => {
       if(!response.ok) {
         console.log(response.data);
+        alert("Invalid Credentials");
       }
       else {
         response.json().then(data => {
@@ -129,7 +131,9 @@ class Login extends Component {
 }
 
 const buttonStyle = {
-  margin: "10px 10px 10px 0px"
+    display: "block",
+    width: "60%",
+    margin: "auto"
 };
 
 export default Login

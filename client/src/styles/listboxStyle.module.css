@@ -18,12 +18,33 @@
 }
 
 .listContainer {
-    padding: 30px;
-    border: 2px solid #333a41;
+    height: auto;
+    display: flex;
+
 }
 
 .listItem {
-    font-size: 20px;
+    height: 170px;
+    width: 170px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    margin: 20px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgb(206,206,206);
+}
+
+@media( max-width: 500px ) {
+    .listItem {
+        height: 160px;
+        width: 160px;
+    }
+}
+
+.listItem p {
+    color: #ffffff;
+    margin: auto;
 }
 
 .listItem a:hover {
@@ -38,13 +59,13 @@ p {
 .modalTitle {
     width: 100%;
     font-size: 30px;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
     color: rgb(72,72,72);
     font-weight: bold;
 }
 
 .inputText {
-    font-family: Georgia,"Times New Roman",Times,serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
     background: rgba(255,255,255,.1);
     border: 0;
     border-radius: 4px;
@@ -68,7 +89,7 @@ p {
 }
 
 .inputSelect {
-    font-family: Georgia,"Times New Roman",Times,serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
     background: rgba(255,255,255,.1);
     border: 0;
     border-radius: 4px;

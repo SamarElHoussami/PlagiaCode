@@ -1,8 +1,49 @@
 .pageTitle {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
     text-align: center;
     font-weight: bold;
     display: block;
     width: 100%;
     margin: 20px 0 10px 0;
+}
+
+.bgHeader {
+    background-image: url("../images/header_img.PNG");
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    display: flex;
+}
+
+.profilePic {
+    max-width: 17%;
+    height: auto;
+    max-height: 100%;
+    padding: 25px;
+    display: inline;
+    margin-left: 8%;
+}
+
+.userInfo {
+    display: inline-block;
+    margin-bottom: auto;
+    margin-top: auto;
+}
+
+.userName {
+    color: #ffffff;
+    font-size: 60px;
+    margin: 0;
+}
+
+@media( max-width: 530px ) {
+    .userName {
+        color: #ffffff;
+        font-size: 27px;
+        margin: 0;
+    }
+}
+
+.userType {
+    color: #ffffff;
 }

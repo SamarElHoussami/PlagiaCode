@@ -1,15 +1,16 @@
 import React from "react";
+import styles from '../styles/registerStyle.module.css';
 
 const Select = props => {
   return (
     <div className="form-group">
-      <label htmlFor={props.name}> {props.title} </label>
+      <label htmlFor={props.name} className={styles.inputLabel}> {props.title} </label>
       <select
         id={props.name}
         name={props.name}
         value={props.value}
         onChange={props.handleChange}
-        className="form-control"
+        className={[styles.textInput, "form-control"].join(' ')}
       >
         <option value="" disabled>
           {props.placeholder}

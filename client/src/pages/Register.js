@@ -130,21 +130,23 @@ class Register extends Component {
             placeholder={"Select type of user"}
             handleChange={this.handleInput}/> {/* Type Selection */}
 
-          <Button
-            action={this.handleFormSubmit}
-            type={"primary"}
-            title={"Submit"}
-            style={buttonStyle}
-          />{" "}
-          {/*Submit */}
+          <div className={styles.btnContainer}>
+            <Button
+              action={this.handleFormSubmit}
+              type={"primary"}
+              title={"Submit"}
+              style={buttonStyle}
+            />{" "}
+            {/*Submit */}
 
-          <Button
-            action={this.handleClearForm}
-            type={"secondary"}
-            title={"Clear"}
-            style={buttonStyle}
-          />{" "}
-          {/* Clear the form */}
+            <Button
+              action={this.handleClearForm}
+              type={"secondary"}
+              title={"Clear"}
+              style={buttonStyle}
+            />{" "}
+            {/* Clear the form */}
+          </div>
         </form>
 
         <div className={styles.changeAuth}>
@@ -157,7 +159,8 @@ class Register extends Component {
 }
 
 const buttonStyle = {
-  margin: "10px 10px 10px 0px"
+  margin: "auto",
+  width: "45%"
 };
 
 export default Register

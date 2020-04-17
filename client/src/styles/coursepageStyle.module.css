@@ -4,7 +4,7 @@
 }
 
 .pageTitle {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
     text-align: center;
     font-weight: bold;
     display: block;
@@ -36,14 +36,14 @@
 }
 
 p {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
     font-size: 25px;
     margin-bottom: 0;
     margin-top: 1rem;
 }
 
 li {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
     font-size: 25px;
     margin: 0;
 }
@@ -51,7 +51,7 @@ li {
 .modalTitle {
     width: 100%;
     font-size: 30px;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
     color: rgb(72,72,72);
     font-weight: bold;
 }
@@ -61,7 +61,7 @@ li {
 }
 
 .inputText {
-    font-family: Georgia,"Times New Roman",Times,serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
     background: rgba(255,255,255,.1);
     border: 0;
     border-radius: 4px;
@@ -85,7 +85,7 @@ li {
 }
 
 .inputSelect {
-    font-family: Georgia,"Times New Roman",Times,serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
     background: rgba(255,255,255,.1);
     border: 0;
     border-radius: 4px;
