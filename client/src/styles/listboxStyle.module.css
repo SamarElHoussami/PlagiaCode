@@ -20,6 +20,7 @@
 .listContainer {
     height: auto;
     display: flex;
+    flex-wrap: wrap;
 
 }
 
@@ -27,7 +28,8 @@
     height: 170px;
     width: 170px;
     background-color: #ffffff;
-    border-radius: 50%;
+    background-size: contain;
+    border-radius: 4px;
     margin: 20px;
     justify-content: center;
     display: flex;
@@ -35,8 +37,39 @@
     border: 1px solid rgb(206,206,206);
 }
 
+.listItem:hover {
+    border: 2px solid rgb(175, 84, 237);
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.addBtn {
+    background-image: url("../images/plus.PNG");
+    border: 2px solid rgb(175, 84, 237);
+    height: 170px;
+    width: 170px;
+    background-color: #ffffff;
+    background-size: contain;
+    border-radius: 4px;
+    margin: 20px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.addBtn:hover {
+    border: 2px solid rgb(175, 84, 237);
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
 @media( max-width: 500px ) {
     .listItem {
+        height: 160px;
+        width: 160px;
+    }
+
+    .addBtn {
         height: 160px;
         width: 160px;
     }

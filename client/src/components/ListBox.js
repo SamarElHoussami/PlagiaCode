@@ -26,7 +26,9 @@ class ListBox extends React.Component {
             loading: 0,
             courseName: '',
             courseCode: '',
-            courseTa: 0
+            courseTa: 0,
+            renderCourses: true,
+            listItems: null
         }
 
         this.getCourses = this.getCourses.bind(this);
@@ -95,9 +97,9 @@ class ListBox extends React.Component {
     renderList() {
         let listItems = null;
         if(this.state.myCourseNames !== null && this.state.myCourseNames != undefined) {
-            return listItems = this.state.myCourseNames.map((courseName) => 
+            listItems = this.state.myCourseNames.map((courseName) => 
                 <a
-                style={{backgroundColor: this.pickColor()}}
+                style={this.pickColor()}
                 className={styles.listItem} 
                 key={courseName}
                 name={courseName}
@@ -112,7 +114,12 @@ class ListBox extends React.Component {
                         });
                     }}
                 ><p>{courseName}</p></a>
-            )
+            );
+            this.setState({
+                renderCourses: false,
+                listItems: listItems
+            });
+            return listItems;
         } else {
             return listItems = null;
         }
@@ -266,7 +273,8 @@ class ListBox extends React.Component {
                     var joined = this.state.myCourseNames.concat(data.course.name)
                     
                     this.setState({
-                        myCourseNames: joined
+                        myCourseNames: joined,
+                        renderCourses: true
                     })
 
                     this.handleClose();
@@ -314,7 +322,8 @@ class ListBox extends React.Component {
 
                     this.setState({
                         myCourseNames: joinedNames,
-                        allCourses: joinedCourses
+                        allCourses: joinedCourses,
+                        renderCourses: true
                     })
                     
                     this.handleClose();
@@ -328,11 +337,15 @@ class ListBox extends React.Component {
 
     pickColor() {
         var opts = ["rgba(27,218,209,0.3)", "rgba(27,112,218,0.3)", "rgba(30,27,218,0.3)","rgba(197,27,218,0.3)", "rgba(218,27,115,0.3)","rgba(218,27,27,0.3)"];
-        return opts[Math.floor((Math.random()*opts.length))];
+        var style = {
+            backgroundColor: opts[Math.floor((Math.random()*opts.length))],
+            backgroundImage: "none"
+        }
+        return style;
     }
 
     render() {
-        console.log(this.state.loading);
+        console.log(this.state.renderCourses);
         if(this.state.loading === 3) {
             return (
                 <Fragment>  
@@ -341,10 +354,9 @@ class ListBox extends React.Component {
                     
 
                     <div className={styles.listContainer}>
-                        {this.state.type == "courses" ? <a className={styles.listItem} onClick={this.state.user.type=="Student"? this.handleShowStudent : this.handleShowTeacher}>
-                        <p>+</p>
+                        {this.state.type == "courses" ? <a className={styles.addBtn} onClick={this.state.user.type=="Student"? this.handleShowStudent : this.handleShowTeacher}>
                         </a>: null}
-                        {this.renderList()}
+                        {this.state.renderCourses && this.renderList() || this.state.listItems}
                     </div>
 
                     <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={this.state.show && this.state.modalFor=="Student"} onHide={this.handleClose}>
@@ -397,9 +409,6 @@ class ListBox extends React.Component {
             )
         }
     }
-}
-const randomColor = {
-    backgroundColor: "rgba(" + 177+Math.random()*(255-177)+ ",27,27,0.3)"
 }
 
 export default withRouter(ListBox);
