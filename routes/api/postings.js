@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
 var fs = require('fs');
 var multer = require('multer')
-var stringSimilarity = require('string-similarity');
+var stringSimilarity = require('string-similarity'); //https://github.com/aceakash/string-similarity
 var ObjectId = require('mongoose').Types.ObjectId; 
 var mongoose = require('mongoose');//.set('debug', true);
 
@@ -52,12 +52,10 @@ router.get("/submissions/:id", async (req, res) => {
     const posting_id = req.params.id;
     
     let submissions = await Assignment.find({ posting: posting_id }).catch(err => console.log(err));
-    //console.log(submissions);
 
     let finalSubmissions = [];
 
     submissions.forEach(element => {
-        //console.log(element.studentName);
         finalSubmissions.push(element);
     });
 
@@ -70,15 +68,8 @@ router.get("/submissions/:id", async (req, res) => {
 router.post("/course-postings", async (req, res) => {
     
     console.log(JSON.stringify(req.body));
-    let posting_ids = req.body.posting_ids;//new Array();
+    let posting_ids = req.body.posting_ids;
 
-    //if there's only one posting, make it so you don't iterate through posting id string
-    /*if(req.body.posting_ids.length > 5) {
-        posting_ids.push(req.body.posting_ids);
-    } else {
-        posting_ids = req.body.posting_ids;
-    }*/
-    
     const postings = new Array();
 
     for (var i = 0; i < posting_ids.length; i++) {
@@ -90,7 +81,6 @@ router.post("/course-postings", async (req, res) => {
         }).catch(err => console.log(err));
     };
     
-    //console.log("names: "+courseNames);
     return res.json(postings);    
 });
 
@@ -224,10 +214,34 @@ router.post("/new", (req, res) => {
 // @access Public
 router.post("/plagiarism-check", (req, res) => {
     const first_text = fs.readFileSync("client/public" + req.body.first, 'utf8');
-    const second_text = fs.readFileSync("client/public" + req.body.second, 'utf8');
-    var result = stringSimilarity.compareTwoStrings(first_text, second_text); 
+
+    //if 2 assignments were selected or only 2 assignments were submitted
+    if(!Array.isArray(req.body.second) || req.body.second.length === 2) {
+        const second_text = fs.readFileSync("client/public" + req.body.second, 'utf8');
+        //compare both texts
+        var result = stringSimilarity.compareTwoStrings(first_text, second_text); 
+        var message = "The assignments are " + (result*100).toFixed(2) + "% similar.";
+        return res.json({message: message});
+    } else {
+        //get all assignments that are not the selected assignment
+        var submissions = req.body.second.filter(function(e) { if(e.filePath.toString().localeCompare(req.body.first) !== 0) { return e; }})
+        //create an array of assignment text
+        var submissionsText = submissions.map(e => fs.readFileSync("client/public" + e.filePath, 'utf8'));
+        var result = stringSimilarity.findBestMatch(first_text, submissionsText); 
+        //find best match
+        var fileName = getNameFromText(result.bestMatch.target, result, submissions);
+        var message = "The selected assignment is most similar to " + fileName + " with " + (result.bestMatch.rating*100).toFixed(2) + "% similarity.";
+        return res.json({message: message});
+    }
     
-    return res.json(result);
+    function getNameFromText(text, result, submissions) {
+        for(i in result.ratings) {
+            if(result.ratings[i].target.localeCompare(text) == 0) {
+                return submissions[i].name;
+            }
+        }
+        return -1;
+    }
 });
 
 module.exports = router;

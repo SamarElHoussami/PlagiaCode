@@ -181,17 +181,17 @@ class CoursePage extends React.Component {
     }
 
     renderCompareButton(toCompare) {
-        if(toCompare.length === 2) {
+        if(toCompare.length === 2 || toCompare.length === 1) {
             return (
                 <Fragment>
-                    <p className={styles.note}>*check 2 students to enable</p>
+                    <p className={styles.note}>*check 2 students to compare, check one student to find best match</p>
                     <Button style={{float:"right"}} variant="primary" onClick={this.handleSubmitCompare}>Check Plagiarism</Button> 
                 </Fragment>
             );
         } else {
             return (
                 <Fragment>
-                    <p className={styles.note}>*check 2 students to enable</p>
+                    <p className={styles.note}>*check 2 students to compare, check one student to find best match</p>
                     <Button style={{float:"right"}} variant="primary" disabled>Check Plagiarism</Button> 
                 </Fragment>
             );
@@ -324,7 +324,7 @@ class CoursePage extends React.Component {
     ************************************************** */
 
     render() {
-        console.log(this.state.selectedFile);
+        console.log(this.state.submissions);
         if(this.state.course !== null && this.state.loading == 5) {
             return (
                 <Fragment>
@@ -582,9 +582,22 @@ class CoursePage extends React.Component {
     }
 
     handleSubmitCompare() {
-        let files = {
-            first: this.state.toCompare[0],
-            second: this.state.toCompare[1]
+        let files = {};
+        if(this.state.toCompare.length == 2) {
+            files = {
+                first: this.state.toCompare[0],
+                second: this.state.toCompare[1]
+            }
+        } else  if(this.state.submissions.length == 2) {
+            files = {
+                first: this.state.submissions[0].filePath,
+                second: this.state.submissions[1].filePath
+            }
+        } else{
+            files = {
+                first: this.state.toCompare[0],
+                second: this.state.submissions
+            }
         }
 
         fetch('http://localhost:5000/api/postings/plagiarism-check', {
@@ -596,7 +609,7 @@ class CoursePage extends React.Component {
                 }
             }).then(response => {
                 response.json().then(data => {
-                    alert((data*100.0).toFixed(2) + "% amount of plagiarism was detected between selected files. Do what you must.")
+                    alert(data.message)
                 })
             }).catch(err => {
                 console.log('caught it!',err);
