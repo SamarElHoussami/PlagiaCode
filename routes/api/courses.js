@@ -3,13 +3,18 @@ var bodyParser = require('body-parser');
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+var ObjectId = require('mongoose').Types.ObjectId; 
 const keys = require("../../config/keys");
+var mongoose = require('mongoose');//.set('debug', true);
+var fs = require('fs');
 
 
 // Load User model
+const Assignment = require("../../models/Assignment");
 const Course = require("../../models/Course");
 const User = require("../../models/User");
 const Posting = require("../../models/Posting")
+
 
 // @route GET api/courses/find
 // @desc Find course from course id
@@ -191,6 +196,99 @@ router.post("/:code/new-post", async (req, res) => {
         return res;
     }).catch(err => console.log(err));
 });
+
+// @route POST api/courses/remove
+// @desc Remove course
+// @access Public
+router.post("/remove", async (req, res) => {
+    let user = req.body.user;
+    let course = req.body.course;
+    let updatedUser = null;
+
+    //if user is teacher, delete course from everywhere
+    if(user.type == "Teacher") {
+        console.log("deleting a whole course");
+
+        //delete course from students taking the course
+        User.find({ courses: ObjectId(course._id) }).then(users => {
+            if(users) {
+                users.forEach(function(user){
+                    var removedCourse = user.courses.filter(function(e) { if(e.toString().localeCompare(course._id.toString()) !== 0) { return e; } });
+                    //console.log("og: " + user.courses + "\nremoved: " + removedCourse)
+                    
+                    user.courses = removedCourse;
+                    user.save(function (err) {
+                        if(err) {
+                            console.error('ERROR!' + err);
+                            res.status(400).json({ error: "problem deleting course from users" });
+                        }
+                    });
+                    if(user._id.toString().localeCompare(req.body.user._id.toString()) === 0) {
+                        res.json({user: user});
+                    }
+                });
+            }
+        })
+
+        //delete ta of course
+        User.findOne({ ta: ObjectId(course._id) }).then(user => {
+            if(user) {
+                var removedTa = user.ta.filter(function(e) { if(e.toString().localeCompare(course._id.toString()) !== 0) { return e; } });
+                user.ta = removedTa;
+                user.save(function (err) {
+                    if(err) {
+                        console.error('ERROR!' + err);
+                        res.status(400).json({ error: "problem deleting course from ta" });
+                    }
+                });
+            }
+        })
+
+        //delete postings belonging to course
+        Posting.find({ course: ObjectId(course._id )}).then(postings => {
+            if(postings) {
+                postings.forEach(function(posting){
+                    var toDelete = posting.submissions;
+                    toDelete.forEach(async function (submission){
+                        await Assignment.findById(ObjectId(submission)).then((assignment) => {
+                            if(assignment){
+                            
+                                //delete file from folder
+                                try {
+                                    fs.unlinkSync("client/public" + assignment.filePath)
+                                } catch(err) {
+                                    console.error(err)
+                                    res.status(400).json({ error: "problem deleting file from folder" });
+                                }
+                                
+                                //delete assignment from database
+                                assignment.remove();
+                            }
+                        });        
+                        //assignmentsToDelete.push(submission);
+                    });
+
+                    posting.remove();
+                })
+            }
+        })
+
+        Course.findById(ObjectId(course._id)).then(course => {
+            if(course) course.remove();
+        })
+        return res;
+    } else {
+        if(user.type == "Student") {
+            User.findById( user._id ).then(user => {
+                if(users) console.log("removing course from " + user);
+            })
+        }
+
+        return res.json("successfully deleted course")
+    }
+
+});
+
 
 
 module.exports = router;

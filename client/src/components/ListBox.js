@@ -28,7 +28,9 @@ class ListBox extends React.Component {
             courseCode: '',
             courseTa: 0,
             renderCourses: true,
-            listItems: null
+            listItems: null,
+            editCourses: false,
+            removeCourse: null
         }
 
         this.getCourses = this.getCourses.bind(this);
@@ -41,6 +43,9 @@ class ListBox extends React.Component {
         this.handleAdd = this.handleAdd.bind(this);
         this.handleCreate = this.handleCreate.bind(this);
         this.getObjFromName = this.getObjFromName.bind(this);
+        this.confirmRemoveCourse = this.confirmRemoveCourse.bind(this);
+        this.removeCourse = this.removeCourse.bind(this);
+        
 
     }
 
@@ -72,7 +77,8 @@ class ListBox extends React.Component {
                 className={styles.listItem} 
                 key={courseName}
                 name={courseName}
-                onClick={event => {
+                onClick={event => { 
+                    if(!this.state.editCourses) {
                         var courseObj = this.getObjFromName(courseName, this.state.allCourses);
                         this.props.history.push({
                             pathname: `/courses/${courseName}`,
@@ -82,7 +88,8 @@ class ListBox extends React.Component {
                             }
                         });
                     }}
-                ><p>{courseName}</p></a>
+                }
+                ><p><b>{courseName}</b> Course Code: {this.getObjFromName(courseName, this.state.allCourses).code}</p><Button variant="danger" style={{display: this.state.editCourses ? "inline" : "none"}} className={styles.rmvBtn} onClick={event => { this.setState({ removeCourse: this.getObjFromName(courseName, this.state.allCourses) })}}>-</Button></a>
             );
             this.setState({
                 renderCourses: false,
@@ -92,6 +99,31 @@ class ListBox extends React.Component {
         } else {
             return listItems = null;
         }
+    }
+
+    confirmRemoveCourse() {
+        let course = this.state.removeCourse;
+
+        if(course !== null) return(
+        <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={course !== null} onHide={this.handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title className={styles.modalTitle}>Are you sure you want to remove the following course?</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <p><b>Course name:</b> {course.name}</p>
+                <p><b>Course Code:</b> {course.code}</p>
+            </Modal.Body>
+            
+            <Modal.Footer>
+                <Button variant="secondary" onClick={this.handleClose}>
+                    Cancel
+                </Button>
+                <Button variant="danger" onClick={this.removeCourse.bind(this, course)}>
+                    Remove
+                </Button>
+            </Modal.Footer>
+        </Modal>
+        );
     }
 
     getObjFromName(name, list) {
@@ -122,7 +154,8 @@ class ListBox extends React.Component {
     handleClose() {
         this.setState({
             show: false,
-            modalFor: null
+            modalFor: null,
+            removeCourse: null
         })
     }
 
@@ -150,13 +183,20 @@ class ListBox extends React.Component {
     ************************************************** */
 
     render() {
-        console.log(this.state.renderCourses);
+        console.log(this.state.allCourses);
         if(this.state.loading === 3) {
             return (
                 <Fragment>  
 
                     <h1 className={styles.containerTitle}>{this.state.type === "courses" ? "My courses: " : "Courses I TA"}</h1>
                     
+                    {this.state.type === "courses" ? 
+                    <a className={styles.editCoursesBtn} onClick={event => {
+                        this.setState({
+                            editCourses: !this.state.editCourses,
+                            renderCourses: !this.state.renderCourses
+                        })
+                    }}>{this.state.editCourses ? "done" : "edit courses"}</a> : null }
 
                     <div className={styles.listContainer}>
                         {this.state.type == "courses" ? <a className={styles.addBtn} onClick={this.state.user.type=="Student"? this.handleShowStudent : this.handleShowTeacher}>
@@ -205,6 +245,8 @@ class ListBox extends React.Component {
                             </Button>
                         </Modal.Footer>
                     </Modal>
+
+                    {this.confirmRemoveCourse()}
                 </Fragment>
             )} else {
             return (
@@ -304,6 +346,7 @@ class ListBox extends React.Component {
 
     //gets all courses and renders select input for them
     renderOpts() {
+        console.log("rendering course opts");
         fetch('http://localhost:5000/api/courses/all', {
             method: "GET",
             headers: {
@@ -335,6 +378,8 @@ class ListBox extends React.Component {
                         listOpts.push(<option key={data[i]._id} value={data[i].name}>{data[i].name}</option>);
                         courseObj.push(data[i]);      
                     }
+
+                    console.log(courseObj);
 
                     this.setState({
                             courseOpts: listOpts,
@@ -385,7 +430,7 @@ class ListBox extends React.Component {
             this.handleClose();
         });
         } else {
-            console.log("course already added")
+            alert("course already added")
             this.handleClose();
         }
     }
@@ -419,6 +464,46 @@ class ListBox extends React.Component {
                         myCourseNames: joinedNames,
                         allCourses: joinedCourses,
                         renderCourses: true
+                    })
+                    
+                    this.handleClose();
+                })
+            }
+        }).catch(err => {
+            console.log('caught it!',err);
+        });
+
+    }
+
+        //creats new course
+     removeCourse(course) {
+        console.log("removing " + course.name)
+        let data = {
+            course: course,
+            user: this.state.user
+        }
+         fetch('http://localhost:5000/api/courses/remove', {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            if(!response.ok) {
+                console.log("error: " + response.data);
+            } else {
+                response.json().then(data => {
+                    this.props.handleUpdate(data.user);
+                    console.log(data);
+                    var removedCourse = this.state.allCourses.filter(function(e) {if(e._id.localeCompare(course._id) !== 0) {return e}});
+                    console.log("og: " + this.state.allCourses + "\nremoved: " + removedCourse);
+                    var removedCourseName = this.state.myCourseNames.filter(function(e) {if(e.localeCompare(course.name) !== 0) {return e}});
+                    this.setState({
+                        allCourses: removedCourse,
+                        myCourseNames: removedCourseName,
+                        renderCourses: true, 
+
                     })
                     
                     this.handleClose();

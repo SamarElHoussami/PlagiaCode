@@ -96,12 +96,10 @@ router.post("/submit", async (req, res) => {
         Assignment.findOne({ studentId: ObjectId(req.body.student_id), posting: ObjectId(req.body.posting_id) }).then(assignment => {
             console.log(JSON.stringify(assignment));
             if(assignment) {
-                console.log("FOUND ASSIGNMENT: " + JSON.stringify(assignment));
                 
                 //remove existing assignment from student assignments array
                 User.findById(assignment.studentId, function (err, user) {
                     var removedAssign = user.assignments.filter(function(e) { if(e.toString().localeCompare(assignment._id.toString()) !== 0) { return e; } });
-                    console.log(removedAssign  + " not working?")
                     user.assignments = removedAssign;
                     user.save(function (err) {
                         if(err) {

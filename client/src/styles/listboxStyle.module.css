@@ -18,6 +18,22 @@
     transform: translateX(16px);
 }
 
+.rmvBtn {
+    border-radius: 50%;
+    font-weight: bold;
+    height: 45px;
+    width: 45px;
+    display: inline-block;
+    transform: translate(145px, -85px);
+    position: absolute;
+}
+
+.editCoursesBtn {
+    display: inline;
+    cursor: pointer;
+    float: right;
+}
+
 .listContainer {
     height: auto;
     display: flex;
@@ -79,6 +95,16 @@
 .listItem p {
     color: #ffffff;
     margin: auto;
+    text-align: center;
+    font-size: small;
+}
+
+.listItem p b {
+    color: #ffffff;
+    margin: auto;
+    text-align: center;
+    font-size: 30px !important;
+    display: block;
 }
 
 .listItem a:hover {

@@ -565,38 +565,42 @@ class CoursePage extends React.Component {
     }
 
     handleSubmitCompare() {
-        let files = {};
-        if(this.state.toCompare.length == 2) {
-            files = {
-                first: this.state.toCompare[0],
-                second: this.state.toCompare[1]
-            }
-        } else  if(this.state.submissions.length == 2) {
-            files = {
-                first: this.state.submissions[0].filePath,
-                second: this.state.submissions[1].filePath
-            }
-        } else{
-            files = {
-                first: this.state.toCompare[0],
-                second: this.state.submissions
-            }
-        }
-
-        fetch('http://localhost:5000/api/postings/plagiarism-check', {
-                method: "POST",
-                body: JSON.stringify(files),
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json"
+        if(!this.state.submissions.length == 1) {
+            let files = {};
+            if(this.state.toCompare.length == 2) {
+                files = {
+                    first: this.state.toCompare[0],
+                    second: this.state.toCompare[1]
                 }
-            }).then(response => {
-                response.json().then(data => {
-                    alert(data.message)
-                })
-            }).catch(err => {
-                console.log('caught it!',err);
-            }); 
+            } else if(this.state.submissions.length == 2) {
+                files = {
+                    first: this.state.submissions[0].filePath,
+                    second: this.state.submissions[1].filePath
+                }
+            } else{
+                files = {
+                    first: this.state.toCompare[0],
+                    second: this.state.submissions
+                }
+            }
+
+            fetch('http://localhost:5000/api/postings/plagiarism-check', {
+                    method: "POST",
+                    body: JSON.stringify(files),
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json"
+                    }
+                }).then(response => {
+                    response.json().then(data => {
+                        alert(data.message)
+                    })
+                }).catch(err => {
+                    console.log('caught it!',err);
+                }); 
+        } else {
+            alert("Error: Cannot check for plagiarism with only one submission");
+        }
     }
 }
 

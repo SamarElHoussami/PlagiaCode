@@ -141,6 +141,7 @@ li {
 .courseInfo {
     display: inline-block;
     margin: auto;
+    padding-bottom: 20px;
 }
 
 .courseName {
@@ -159,6 +160,5 @@ li {
 }
 
 .courseCode {
-    margin-bottom: 20px;
     color: #ffffff;
 }
