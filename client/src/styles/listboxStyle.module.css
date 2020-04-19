@@ -4,8 +4,9 @@
 }
 
 .containerTitle {
+    padding-top: 20px;
     font-size: 25px;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
     display: inline;
 }
 
@@ -86,7 +87,7 @@
 }
 
 p {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Basis Grotesque Pro', sans-serif;
 }
 
 .modalTitle {

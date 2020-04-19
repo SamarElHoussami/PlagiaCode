@@ -131,7 +131,9 @@ class CoursePage extends React.Component {
         return {date: dateText, time: timeText}
     }
 
-
+    isTa(courseTa, student) {
+        return courseTa[0]._id.localeCompare(student._id) === 0;
+    }
 
     viewSubmissions(curPosting) {
         let subs = null;
@@ -237,11 +239,11 @@ class CoursePage extends React.Component {
                             </Fragment>
                         : null }
                         <hr/>
-                        {this.state.user.type === "Teacher" ? <Fragment><h1 className={styles.modalTitle}>Student Submissions</h1>{this.viewSubmissions(curPosting)}</Fragment> : null }
+                        {this.state.user.type === "Teacher" || this.isTa(this.state.ta, this.state.user)? <Fragment><h1 className={styles.modalTitle}>Student Submissions</h1>{this.viewSubmissions(curPosting)}</Fragment> : null }
                     </div>
                     </Modal.Body>
                     <Modal.Footer className={styles.modalFooter}>
-                        {this.state.user.type === "Teacher" ? this.renderCompareButton(this.state.toCompare) : null} 
+                        {this.state.user.type === "Teacher" || this.isTa(this.state.ta, this.state.user)? this.renderCompareButton(this.state.toCompare) : null} 
                     </Modal.Footer>
                 </Modal>
             );
@@ -324,23 +326,22 @@ class CoursePage extends React.Component {
     ************************************************** */
 
     render() {
-        console.log(this.state.submissions);
         if(this.state.course !== null && this.state.loading == 5) {
+        console.log(this.isTa(this.state.ta, this.state.user));
             return (
                 <Fragment>
+                    <div className={styles.bgHeader}>
+                        <div className={styles.courseInfo}>
+                            <h3 className={styles.courseName}>{this.state.courseName}</h3>
+                            <h5 className={styles.courseCode}><b>Code:</b> {this.state.course.code}</h5>
+                        </div>
+                    </div>
                     <Container>
                         <Row xs={12}>
-                            <h1 className={styles.pageTitle}>Course Info</h1>
-                        </Row>
-                        <hr/>
-                        <Row xs={12}>
                         <Col xs={6}>
-                        
-                            <p><b>Course Name:</b> {this.state.courseName}</p>
-                            <p><b>Course Code:</b> {this.state.course.code}</p>
-                            <p><b>Teacher:</b></p> {this.renderNames("teacher")}
-                            <p><b>Students:</b></p><ul>{this.renderNames("students")}</ul>
+                            <p><b>Teacher:</b></p> <ul>{this.renderNames("teacher")}</ul>
                             <p><b>Ta:</b></p><ul>{this.renderNames("ta")}</ul>
+                            <p><b>Students:</b></p><ul>{this.renderNames("students")}</ul>
                         </Col> 
                         <Col xs={6}>
                             <p><b>Assignments:</b> {this.state.user.type === "Teacher" ? this.renderCreatePostButton() : null}</p>
@@ -539,24 +540,6 @@ class CoursePage extends React.Component {
                 console.log('caught it!',err);
                 alert("An error occured. Please make to select a file before uploading.");
             }); 
-
-
-
-        /*event.preventDefault();
-
-        const data = new FormData()
-        data.append('file', this.state.selectedFile);
-        data.append('studentID', this.state.user._id);
-        data.append('student_name', this.state.user.name);
-        data.append('posting_id', this.state.selectId);
-
-        console.log(data);
-
-        axios.post("http://localhost:5000/api/postings/submit", data, { 
-        }).then(res => { 
-            console.log(res.statusText);
-            this.handleClose();
-        }).catch(err => alert("An error occured. Please make to select a file before uploading."));*/
     }
 
     //get submissions of course we're trying to load

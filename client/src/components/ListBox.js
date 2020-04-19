@@ -44,55 +44,24 @@ class ListBox extends React.Component {
 
     }
 
+    /**************************************************
+    
+                           LIFECYCLE
+    
+    ************************************************** */
+
     componentWillMount() {
         console.log(this.state.list);
         this.getCourses(); 
         this.renderOpts();
         this.getStudents();
     }
-    /*const type = props.type; //either course, user, or posting
-    TODO: display title, list of links depending on type of list
 
-    for course:
-        add btn on top right brings you to search page for courses (or lets you search for courses from search bar? or predefined drop list)
-        every coourse has delete btn
-        every course links opens modal of course info or course page for it
-
-    for user: shows user info (teacher or student) like courses they're taking and teaching
-
-*/
-    // input: course IDs
-    // output: course names
-    getCourses() {
-        let userCourses = {
-            "courses": this.state.list
-        }
-        console.log("before api request " + JSON.stringify(userCourses));
-        fetch('http://localhost:5000/api/courses/my-courses', {
-            method: "POST",
-            body: JSON.stringify(userCourses),
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            }
-        }).then(response => {
-            if(!response.ok) {
-                console.log("AFTER API CALL FOR COURSES: " + response.data);
-                return false;
-            } else {
-                response.json().then(data => {
-                    console.log("Successful" + JSON.stringify(data));
-                    this.setState({
-                        myCourseNames: data,
-                        loading: this.state.loading + 1
-                    })
-                })
-                return true;
-            }
-        }).catch(err => {
-            console.log('caught it!',err);
-        });
-    }
+    /**************************************************
+    
+                           HELPER FUNCTIONS
+    
+    ************************************************** */
 
     renderList() {
         let listItems = null;
@@ -157,182 +126,12 @@ class ListBox extends React.Component {
         })
     }
 
-    getStudents() {
-        fetch('http://localhost:5000/api/users/students', {
-            method: "GET",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            }
-        }).then(response => {
-            if(!response.ok) {
-                console.log("AFTER API CALL FOR COURSES: " + response.data);
-                return false;
-            } else {
-                response.json().then(data => {
-                    console.log("Successful" + JSON.stringify(data));
-                    
-                    var studentOpts = [];
-                    var studentObj = [];
-
-                    if(data.length === 0) {
-                        this.setState({
-                            studentOpts: <option key={0} value={0}>No students available</option>
-                        });
-                        return;
-
-                    } else {
-                        studentOpts.push(<option key={0} value={0}>Select a student</option>);
-                    }
-
-                    for(var i in data) {
-                        console.log("students in data: " + JSON.stringify(data[i].name))
-                        studentOpts.push(<option key={data[i]._id} value={data[i].name}>{data[i].name}</option>);
-                        studentObj.push(data[i]);      
-                    }
-
-                    this.setState({
-                            studentOpts: studentOpts,
-                            allStudents: studentObj,
-                            loading: this.state.loading + 1
-                    });
-                })
-                return true;
-            }
-        }).catch(err => {
-            console.log('caught it!',err);
-        });
-    }
-
-    renderOpts() {
-        fetch('http://localhost:5000/api/courses/all', {
-            method: "GET",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            }
-        }).then(response => {
-            if(!response.ok) {
-                console.log("AFTER API CALL FOR COURSES: " + response.data);
-            } else {
-                response.json().then(data => {
-                    console.log("Successful" + JSON.stringify(data));
-
-                    var listOpts = [];
-                    var courseObj = [];
-
-                    if(data.length === 0) {
-                        this.setState({
-                            courseOpts: <option key={0} value={0}>No courses available</option>
-                        });
-                        return;
-
-                    } else {
-                        listOpts.push(<option key={0} value={0}>Select a course</option>);
-                    }
-
-                    for(var i in data) {
-                        console.log("course in data: " + JSON.stringify(data[i].name))
-                        listOpts.push(<option key={data[i]._id} value={data[i].name}>{data[i].name}</option>);
-                        courseObj.push(data[i]);      
-                    }
-
-                    this.setState({
-                            courseOpts: listOpts,
-                            allCourses: courseObj,
-                            loading: this.state.loading + 1
-                    });
-                })
-            }
-        }).catch(err => {
-            console.log('caught it!',err);
-        });
-    }
-
-    handleAdd() {
-        if(!this.state.myCourseNames.includes(this.state.selectValue) && this.state.selectValue !== 0) {
-       
-        let addedCourse = {
-            name: this.state.selectValue,
-            user: this.state.user
-        } 
-
-        fetch('http://localhost:5000/api/courses/add', {
-            method: "POST",
-            body: JSON.stringify(addedCourse),
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            }
-        }).then(response => {
-            if(!response.ok) {
-                console.log("error: " + response.data);
-            } else {
-                response.json().then(data => {
-                    this.props.handleUpdate(data.user);
-                    var joined = this.state.myCourseNames.concat(data.course.name)
-                    
-                    this.setState({
-                        myCourseNames: joined,
-                        renderCourses: true
-                    })
-
-                    this.handleClose();
-                })
-            }
-        }).catch(err => {
-            console.log('caught it!',err);
-            this.handleClose();
-        });
-        } else {
-            console.log("course already added")
-            this.handleClose();
-        }
-    }
 
     handleChange(e){
         let name = e.target.name;
         let value = e.target.value;
 
         this.setState({ [name]: value });
-    }
-    
-    handleCreate() {
-        let data = {
-            name: this.state.courseName,
-            code: this.state.courseCode,
-            teacher: this.state.user._id,
-            ta: this.state.courseTa !== 0 ? this.getObjFromName(this.state.courseTa, this.state.allStudents)._id : ''
-        }
-         fetch('http://localhost:5000/api/courses/new', {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            }
-        }).then(response => {
-            if(!response.ok) {
-                console.log("error: " + response.data);
-            } else {
-                response.json().then(data => {
-                    this.props.handleUpdate(data.user);
-                    var joinedNames = this.state.myCourseNames.concat(data.course.name);
-                    var joinedCourses = this.state.allCourses.concat(data.course);
-
-                    this.setState({
-                        myCourseNames: joinedNames,
-                        allCourses: joinedCourses,
-                        renderCourses: true
-                    })
-                    
-                    this.handleClose();
-                })
-            }
-        }).catch(err => {
-            console.log('caught it!',err);
-        });
-
     }
 
     pickColor() {
@@ -343,6 +142,12 @@ class ListBox extends React.Component {
         }
         return style;
     }
+
+    /**************************************************
+    
+                           RENDER
+    
+    ************************************************** */
 
     render() {
         console.log(this.state.renderCourses);
@@ -408,6 +213,221 @@ class ListBox extends React.Component {
                 </div>
             )
         }
+    }
+
+    /**************************************************
+    
+                           API CALLS
+    
+    ************************************************** */
+    
+    // input: course IDs
+    // output: course names
+    getCourses() {
+        let userCourses = {
+            "courses": this.state.list
+        }
+        console.log("before api request " + JSON.stringify(userCourses));
+        fetch('http://localhost:5000/api/courses/my-courses', {
+            method: "POST",
+            body: JSON.stringify(userCourses),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            if(!response.ok) {
+                console.log("AFTER API CALL FOR COURSES: " + response.data);
+                return false;
+            } else {
+                response.json().then(data => {
+                    console.log("Successful" + JSON.stringify(data));
+                    this.setState({
+                        myCourseNames: data,
+                        loading: this.state.loading + 1
+                    })
+                })
+                return true;
+            }
+        }).catch(err => {
+            console.log('caught it!',err);
+        });
+    }
+
+    //gets all students and renders select input for them
+    getStudents() {
+        fetch('http://localhost:5000/api/users/students', {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            if(!response.ok) {
+                console.log("AFTER API CALL FOR COURSES: " + response.data);
+                return false;
+            } else {
+                response.json().then(data => {
+                    console.log("Successful" + JSON.stringify(data));
+                    
+                    var studentOpts = [];
+                    var studentObj = [];
+
+                    if(data.length === 0) {
+                        this.setState({
+                            studentOpts: <option key={0} value={0}>No students available</option>
+                        });
+                        return;
+
+                    } else {
+                        studentOpts.push(<option key={0} value={0}>Select a student</option>);
+                    }
+
+                    for(var i in data) {
+                        console.log("students in data: " + JSON.stringify(data[i].name))
+                        studentOpts.push(<option key={data[i]._id} value={data[i].name}>{data[i].name}</option>);
+                        studentObj.push(data[i]);      
+                    }
+
+                    this.setState({
+                            studentOpts: studentOpts,
+                            allStudents: studentObj,
+                            loading: this.state.loading + 1
+                    });
+                })
+                return true;
+            }
+        }).catch(err => {
+            console.log('caught it!',err);
+        });
+    }
+
+    //gets all courses and renders select input for them
+    renderOpts() {
+        fetch('http://localhost:5000/api/courses/all', {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            if(!response.ok) {
+                console.log("AFTER API CALL FOR COURSES: " + response.data);
+            } else {
+                response.json().then(data => {
+                    console.log("Successful" + JSON.stringify(data));
+
+                    var listOpts = [];
+                    var courseObj = [];
+
+                    if(data.length === 0) {
+                        this.setState({
+                            courseOpts: <option key={0} value={0}>No courses available</option>
+                        });
+                        return;
+
+                    } else {
+                        listOpts.push(<option key={0} value={0}>Select a course</option>);
+                    }
+
+                    for(var i in data) {
+                        console.log("course in data: " + JSON.stringify(data[i].name))
+                        listOpts.push(<option key={data[i]._id} value={data[i].name}>{data[i].name}</option>);
+                        courseObj.push(data[i]);      
+                    }
+
+                    this.setState({
+                            courseOpts: listOpts,
+                            allCourses: courseObj,
+                            loading: this.state.loading + 1
+                    });
+                })
+            }
+        }).catch(err => {
+            console.log('caught it!',err);
+        });
+    }
+
+    //adds course to user's list of courses
+    handleAdd() {
+        if(!this.state.myCourseNames.includes(this.state.selectValue) && this.state.selectValue !== 0) {
+       
+        let addedCourse = {
+            name: this.state.selectValue,
+            user: this.state.user
+        } 
+
+        fetch('http://localhost:5000/api/courses/add', {
+            method: "POST",
+            body: JSON.stringify(addedCourse),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            if(!response.ok) {
+                console.log("error: " + response.data);
+            } else {
+                response.json().then(data => {
+                    this.props.handleUpdate(data.user);
+                    var joined = this.state.myCourseNames.concat(data.course.name)
+                    
+                    this.setState({
+                        myCourseNames: joined,
+                        renderCourses: true
+                    })
+
+                    this.handleClose();
+                })
+            }
+        }).catch(err => {
+            console.log('caught it!',err);
+            this.handleClose();
+        });
+        } else {
+            console.log("course already added")
+            this.handleClose();
+        }
+    }
+
+
+    //creats new course
+     handleCreate() {
+        let data = {
+            name: this.state.courseName,
+            code: this.state.courseCode,
+            teacher: this.state.user._id,
+            ta: this.state.courseTa !== 0 ? this.getObjFromName(this.state.courseTa, this.state.allStudents)._id : ''
+        }
+         fetch('http://localhost:5000/api/courses/new', {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            if(!response.ok) {
+                console.log("error: " + response.data);
+            } else {
+                response.json().then(data => {
+                    this.props.handleUpdate(data.user);
+                    var joinedNames = this.state.myCourseNames.concat(data.course.name);
+                    var joinedCourses = this.state.allCourses.concat(data.course);
+
+                    this.setState({
+                        myCourseNames: joinedNames,
+                        allCourses: joinedCourses,
+                        renderCourses: true
+                    })
+                    
+                    this.handleClose();
+                })
+            }
+        }).catch(err => {
+            console.log('caught it!',err);
+        });
+
     }
 }
 

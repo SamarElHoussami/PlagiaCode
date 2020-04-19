@@ -11,16 +11,16 @@
     background-image: url("../images/header_img.PNG");
     background-position: center top;
     background-repeat: no-repeat;
-    background-size: 100% auto;
+    background-size: 100% 300px;
     display: flex;
+    margin-bottom: 20px;
 }
 
 .profilePic {
-    max-width: 17%;
-    height: auto;
-    max-height: 100%;
-    padding: 25px;
+    max-width: 11%;
+    padding: 12px;
     display: inline;
+    object-fit: contain;
     margin-left: 8%;
 }
 
