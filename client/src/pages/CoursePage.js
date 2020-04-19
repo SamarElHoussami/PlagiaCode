@@ -122,11 +122,13 @@ class CoursePage extends React.Component {
         return {date: dateText, time: timeText}
     }
 
+
+
     viewSubmissions(curPosting) {
         let subs = null;
         
         if(this.state.submissions !== null) {
-            {console.log(this.state.submissions)}
+            {console.log(window.location.origin)}
             return subs = this.state.submissions.map((element) => 
                 <div key={element.studentName}>
                     <hr className={styles.separator}/>
@@ -138,7 +140,7 @@ class CoursePage extends React.Component {
                             onChange={this.handleCompare}
                         />
                     </label>
-                    <p><b>Assignment:</b> <a href={element.filePath}>{element.name}</a></p>
+                    <p><b>Assignment:</b> <a href={window.location.origin + "/" + element.filePath}>{element.name}</a></p>
                     <p><b>Grade:</b> {element.grade === -1 ? "not graded" : element.grade}</p>
                     <p><b>Submitted:</b> {this.dateToText(element.date).date} {this.dateToText(element.date).time} {this.isLate(element.date, curPosting.due_date)}</p>
                     
@@ -148,9 +150,25 @@ class CoursePage extends React.Component {
     }
 
     isLate(subDate, dueDate) {
-        return(
+        let sub = new Date(subDate.substr(0,16))
+        let due = new Date(dueDate.substr(0,16))
+
+        if(sub.getFullYear() <= due.getFullYear() && sub.getMonth() <= due.getMonth() && (sub.getDate()-1) < due.getDate()) {
+            return(
+                <b style={{ color:"green" }}>ON TIME</b>
+            )
+        }
+        else if(sub.getFullYear() == due.getFullYear() && sub.getMonth() == due.getMonth() && (sub.getDate()-1) == due.getDate() && sub.getHours() <= due.getHours() && sub.getMinutes() < due.getMinutes()) {
+            return(
+                <b style={{ color:"green" }}>ON TIME</b>
+            )
+        }
+
+        else {
+            return(
             <b style={{ color:"red" }}>LATE</b>
-        )
+            )
+        }
     }
 
     renderCompareButton(toCompare) {
@@ -301,6 +319,8 @@ class CoursePage extends React.Component {
     ************************************************** */
 
     render() {
+        let postDate = this.state.postDate.getFullYear() + "-" + (this.state.postDate.getMonth()+1) + "-" + this.state.postDate.getDate() + "T" + this.state.postDate.getHours() + ":" + this.state.postDate.getMinutes();
+        console.log(postDate);
         if(this.state.course !== null && this.state.loading == 5) {
             return (
                 <Fragment>
@@ -453,11 +473,18 @@ class CoursePage extends React.Component {
     //create a new post given name, description, and date
     createPost() {
         if(this.state.postName !== '' && this.state.postDesc !== '' && this.state.postDate !== null) {
+            let month = this.state.postDate.getMonth() < 10 ? "0"+ (this.state.postDate.getMonth()+1) : (this.state.postDate.getMonth()+1);
+            let day = this.state.postDate.getDate() < 10 ? "0"+this.state.postDate.getDate() : this.state.postDate.getDate();
+            let hours = this.state.postDate.getHours() < 10 ? "0"+this.state.postDate.getHours() : this.state.postDate.getHours();
+            let minutes = this.state.postDate.getMinutes() < 10 ? "0"+this.state.postDate.getMinutes() : this.state.postDate.getMinutes();
+
+            let postDate = this.state.postDate.getFullYear() + "-" + month + "-" + day + "T" + hours + ":" + minutes + ":00Z";
+
             let newPost = {
                 name: this.state.postName,
                 course: this.state.course._id,
                 description: this.state.postDesc,
-                date: this.state.postDate
+                date: postDate
             }
 
             fetch('http://localhost:5000/api/postings/new', {

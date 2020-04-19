@@ -31,6 +31,7 @@ const AssignmentSchema = new Schema({
   },
   date: {
     type: Date,
+    index : true,
     default: Date.now
   }
 });

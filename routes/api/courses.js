@@ -55,7 +55,7 @@ router.post("/my-courses", async (req, res) => {
     let courseIds = new Array();
 
     //if there's only one course, make it so you don't iterate through course id string
-    if(req.body.courses.length > 5) {
+    if(!Array.isArray(req.body.courses)) {
         courseIds.push(req.body.courses);
     } else {
         courseIds = req.body.courses;

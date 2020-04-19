@@ -115,7 +115,7 @@ router.post("/find-user", async (req, res) => {
     let user_ids = new Array();
 
     //if there's only one user, make it so you don't iterate through user id string
-    if(req.body.user_ids.length> 5) {
+    if(!Array.isArray(req.body.user_ids)) {
         user_ids.push(req.body.user_ids);
     } else {
         user_ids = req.body.user_ids;
