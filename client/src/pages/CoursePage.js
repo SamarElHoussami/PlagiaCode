@@ -53,6 +53,7 @@ class CoursePage extends React.Component {
         this.handleCompare = this.handleCompare.bind(this);
         this.isLate = this.isLate.bind(this);
         this.renderCompareButton = this.renderCompareButton.bind(this);
+        this.handleSubmitCompare = this.handleSubmitCompare.bind(this);
 
     }
 
@@ -100,10 +101,17 @@ class CoursePage extends React.Component {
     onChangeDate = date => this.setState({ postDate: date })
 
     handleCompare(event) {
-        let joined = this.state.toCompare.concat(event.name);
-        this.setState({
-            toCompare: joined
-        })
+        if(this.state.toCompare.includes(event.target.name)) {
+            let removed = this.state.toCompare.filter(function(e) { if(e.localeCompare(event.target.name) !== 0) {return e} })
+            this.setState({
+                toCompare: removed
+            })
+        } else {
+            let joined = this.state.toCompare.concat(event.target.name);
+            this.setState({
+                toCompare: joined
+            })
+        }
     }
 
     handleClose() {
@@ -111,7 +119,8 @@ class CoursePage extends React.Component {
             show: false,
             modalFor: null,
             selectId: null,
-            submissions: null
+            submissions: null,
+            toCompare: []
         })
     }
 
@@ -187,10 +196,6 @@ class CoursePage extends React.Component {
                 </Fragment>
             );
         }
-    }
-
-    handleSubmitCompare() {
-
     }
 
     renderDetailModal() {
@@ -319,8 +324,7 @@ class CoursePage extends React.Component {
     ************************************************** */
 
     render() {
-        let postDate = this.state.postDate.getFullYear() + "-" + (this.state.postDate.getMonth()+1) + "-" + this.state.postDate.getDate() + "T" + this.state.postDate.getHours() + ":" + this.state.postDate.getMinutes();
-        console.log(postDate);
+        console.log(this.state.selectedFile);
         if(this.state.course !== null && this.state.loading == 5) {
             return (
                 <Fragment>
@@ -515,9 +519,34 @@ class CoursePage extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
 
-        const data = new FormData()
+        const data = new FormData();
         data.append('file', this.state.selectedFile);
         data.append('student_id', this.state.user._id);
+        data.append('student_name', this.state.user.name);
+        data.append('posting_id', this.state.selectId);
+
+        console.log(data);
+
+        fetch('http://localhost:5000/api/postings/submit', {
+                method: "POST",
+                body: data,
+
+            }).then(response => {
+                
+                    console.log("uploaded");
+                    this.handleClose();
+            }).catch(err => {
+                console.log('caught it!',err);
+                alert("An error occured. Please make to select a file before uploading.");
+            }); 
+
+
+
+        /*event.preventDefault();
+
+        const data = new FormData()
+        data.append('file', this.state.selectedFile);
+        data.append('studentID', this.state.user._id);
         data.append('student_name', this.state.user.name);
         data.append('posting_id', this.state.selectId);
 
@@ -527,7 +556,7 @@ class CoursePage extends React.Component {
         }).then(res => { 
             console.log(res.statusText);
             this.handleClose();
-        }).catch(err => alert("An error occured. Please make to select a file before uploading."));
+        }).catch(err => alert("An error occured. Please make to select a file before uploading."));*/
     }
 
     //get submissions of course we're trying to load
@@ -550,6 +579,28 @@ class CoursePage extends React.Component {
             console.log('caught it!',err);
             return null;
         });
+    }
+
+    handleSubmitCompare() {
+        let files = {
+            first: this.state.toCompare[0],
+            second: this.state.toCompare[1]
+        }
+
+        fetch('http://localhost:5000/api/postings/plagiarism-check', {
+                method: "POST",
+                body: JSON.stringify(files),
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
+                }
+            }).then(response => {
+                response.json().then(data => {
+                    alert((data*100.0).toFixed(2) + "% amount of plagiarism was detected between selected files. Do what you must.")
+                })
+            }).catch(err => {
+                console.log('caught it!',err);
+            }); 
     }
 }
 

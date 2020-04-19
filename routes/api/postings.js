@@ -5,6 +5,9 @@ const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
 var fs = require('fs');
 var multer = require('multer')
+var stringSimilarity = require('string-similarity');
+var ObjectId = require('mongoose').Types.ObjectId; 
+var mongoose = require('mongoose');//.set('debug', true);
 
 // Load input validation
 const validateRegisterInput = require("../../validation/register");
@@ -91,53 +94,57 @@ router.post("/course-postings", async (req, res) => {
     return res.json(postings);    
 });
 
-// @route POST api/postings/course-postings
-// @desc Get postings names from list of posting ids
+// @route POST api/postings/submit
+// @desc post assignment
 // @access Public
 router.post("/submit", async (req, res) => {
-    
-    //first, check for existing submission
-    Assignment.findOne({ studentID: req.body.student_id }).then(assignment => {
-        if(assignment && assignment.posting.toString().localeCompare(req.body.posting_id) === 0 ) {
-            console.log("FOUND ASSIGNMENT: " + JSON.stringify(assignment));
-            
-            //remove existing assignment from student assignments array
-            User.findById(assignment.studentId, function (err, user) {
-                var removedAssign = user.assignments.filter(function(e) { if(e.toString().localeCompare(assignment._id.toString()) !== 0) { return e; } });
-                console.log(removedAssign  + " not working?")
-                user.assignments = removedAssign;
-                user.save(function (err) {
-                    if(err) {
-                        console.error('ERROR!' + err);
-                    }
-                });
-            });
-
-            //remove existing assignment from posting submissions array
-            Posting.findById(assignment.posting, function (err, post) {
-                var removedAssign = post.submissions.filter(function(e) { if(e.toString().localeCompare(assignment._id.toString()) !== 0) { return e; } });
-                post.submissions = removedAssign;
-
-                post.save(function (err) {
-                    if(err) {
-                        console.error('ERROR!' + err);
-                    }
-                });
-            });
-
-            //delete file from folder
-            try {
-                fs.unlinkSync("client/public" + assignment.filePath)
-            } catch(err) {
-                console.error(err)
-            }
-            
-            //delete existing assignment from database
-            assignment.remove();
-        } 
-    }).catch(err => console.log(err));
 
     upload(req, res, async function (err) {
+        delete req.body.__v;
+
+        //first, check for existing submission
+        Assignment.findOne({ studentId: ObjectId(req.body.student_id), posting: ObjectId(req.body.posting_id) }).then(assignment => {
+            console.log(JSON.stringify(assignment));
+            if(assignment) {
+                console.log("FOUND ASSIGNMENT: " + JSON.stringify(assignment));
+                
+                //remove existing assignment from student assignments array
+                User.findById(assignment.studentId, function (err, user) {
+                    var removedAssign = user.assignments.filter(function(e) { if(e.toString().localeCompare(assignment._id.toString()) !== 0) { return e; } });
+                    console.log(removedAssign  + " not working?")
+                    user.assignments = removedAssign;
+                    user.save(function (err) {
+                        if(err) {
+                            console.error('ERROR!' + err);
+                        }
+                    });
+                });
+
+                //remove existing assignment from posting submissions array
+                Posting.findById(assignment.posting, function (err, post) {
+                    var removedAssign = post.submissions.filter(function(e) { if(e.toString().localeCompare(assignment._id.toString()) !== 0) { return e; } });
+                    post.submissions = removedAssign;
+
+                    post.save(function (err) {
+                        if(err) {
+                            console.error('ERROR!' + err);
+                        }
+                    });
+                });
+
+                //delete file from folder
+                try {
+                    fs.unlinkSync("client/public" + assignment.filePath)
+                } catch(err) {
+                    console.error(err)
+                }
+                
+                //delete existing assignment from database
+                assignment.remove();
+            } 
+        }).catch(err => console.log(err));
+
+        /* UPLOAD FILE */
         if (err instanceof multer.MulterError) {
             return res.status(500).json(err)
         } else if (err) {
@@ -210,6 +217,17 @@ router.post("/new", (req, res) => {
 
         return res;
     });
+});
+
+// @route POST api/postings/plagiarism-check
+// @desc Check for plagiarsim between two files
+// @access Public
+router.post("/plagiarism-check", (req, res) => {
+    const first_text = fs.readFileSync("client/public" + req.body.first, 'utf8');
+    const second_text = fs.readFileSync("client/public" + req.body.second, 'utf8');
+    var result = stringSimilarity.compareTwoStrings(first_text, second_text); 
+    
+    return res.json(result);
 });
 
 module.exports = router;
