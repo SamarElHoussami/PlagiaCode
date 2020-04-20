@@ -36,12 +36,12 @@ to assignments
 ## Installation Instructions
 ````javascript
 // Clone this repo 
-git clone https://github.com/solidsnacks/Picfolio.git
+git clone https://github.com/SamarElHoussami/PlagiaCode.git
 
-// Change to Picfolio directory
-cd Picfolio
+// Change to PlagiaCode directory
+cd PlagiaCode
 
-// Install server dependencies in Picfolio root directory
+// Install server dependencies in PlagiaCode root directory
 npm install
 
 // Change into client folder
