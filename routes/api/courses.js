@@ -33,24 +33,6 @@ router.post("/find", (req, res) => {
     }).catch(err => console.log(err));
 });
 
-//read array
-/*router.post("/my-array", async (req, res) => {
-    
-    console.log(req.body.array);
-    console.log(JSON.stringify(req.body));
-    let arr = req.body.array;
-    console.log(arr);
-    const newArr = new Array();
-
-    for (const e of arr) {
-        console.log("element: " + e);
-        newArr.push(e);
-    }
-    
-    //console.log("names: "+courseNames);
-    return res.json(newArr);    
-});*/
-
 // @route POST api/courses/my-courses
 // @desc Get course names from course codes
 // @access Public
@@ -69,7 +51,6 @@ router.post("/my-courses", async (req, res) => {
     const courseNames = new Array();
 
     for (var i = 0; i < courseIds.length; i++) {
-        console.log("ID: " + courseIds[i]);
         await Course.findById( courseIds[i] ).then(course => {
             if (course) {
                 courseNames.push(course.name);
@@ -126,7 +107,6 @@ router.post("/new", (req, res) => {
 // @access Public
 router.get("/all", async (req, res) => {
     try {
-        console.log("finding all courses");
         const courses = await Course.find();
         res.send(courses);
     } catch (err) {
@@ -139,7 +119,6 @@ router.get("/all", async (req, res) => {
 // @desc Add new course
 // @access Public
 router.post("/add", (req, res) => {
-    console.log(JSON.stringify(req.body))
     Course.findOne({ name: req.body.name }).then(course => {
         
         if (!course) {
@@ -186,7 +165,6 @@ router.post("/:code/new-post", async (req, res) => {
                 due_date: new Date(req.body.year, req.body.month-1, req.body.day)
             })
             .save().then(newPost => {
-                console.log(newPost + " haha");
                 course.postings.push(newPost._id);
                 course.save();
                 res.json({course: course});
@@ -208,7 +186,6 @@ router.post("/remove", async (req, res) => {
 
     //if user is teacher, delete course from everywhere
     if(user.type == "Teacher") {
-        console.log("deleting a whole course");
 
         //delete course from students taking the course
         User.find({ courses: ObjectId(course._id) }).then(users => {

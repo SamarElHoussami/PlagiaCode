@@ -49,7 +49,6 @@ class Register extends Component {
   handleFormSubmit(e) {
     e.preventDefault();
     let userData = this.state.newUser;
-     console.log(JSON.stringify(userData));
     fetch('http://localhost:5000/api/users/register', {
       method: "POST",
       body: JSON.stringify(userData),
@@ -65,7 +64,6 @@ class Register extends Component {
       }
       else {
         response.json().then(data => {
-          console.log("Successful " + JSON.stringify(data));
           this.props.handleLogin(data); //send data back to parent
           this.props.history.push('/dashboard');
         })

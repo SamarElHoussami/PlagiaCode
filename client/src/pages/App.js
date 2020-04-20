@@ -29,7 +29,6 @@ class App extends React.Component {
   }
 
   handleUpdate(data) {
-    console.log("updating user")
     this.setState({
       loggedInStatus: "true"
     });
@@ -47,7 +46,6 @@ class App extends React.Component {
   }
 
   render() {
-    console.log("rerendered app " + this.state.loggedInStatus);
     return (
       <Fragment>
           <NavBar loggedInStatus={this.state.loggedInStatus} handleLogout={this.handleLogout} />

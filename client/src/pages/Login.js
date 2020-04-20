@@ -43,7 +43,6 @@ class Login extends Component {
   handleFormSubmit(e) {
     e.preventDefault();
     let userData = this.state.User;
-     console.log(JSON.stringify(userData));
     fetch('http://localhost:5000/api/users/login', {
       method: "POST",
       body: JSON.stringify(userData),
@@ -53,12 +52,10 @@ class Login extends Component {
       }
     }).then(response => {
       if(!response.ok) {
-        console.log(response.data);
         alert("Invalid Credentials");
       }
       else {
         response.json().then(data => {
-          console.log("Successful" + JSON.stringify(data));
           this.props.handleLogin(data); //send data back to parent
           this.props.history.push({
             pathname: '/dashboard',
@@ -80,7 +77,6 @@ class Login extends Component {
   render() {
     {
       if(this.props.loggedInStatus === "true") {
-        console.log("LOGGED IN");
         return (
           <Button
             action={this.handleUserLogout}

@@ -67,13 +67,11 @@ router.get("/submissions/:id", async (req, res) => {
 // @access Public
 router.post("/course-postings", async (req, res) => {
     
-    console.log(JSON.stringify(req.body));
     let posting_ids = req.body.posting_ids;
 
     const postings = new Array();
 
     for (var i = 0; i < posting_ids.length; i++) {
-        console.log("ID: " + posting_ids[i]);
         await Posting.findById( posting_ids[i] ).then(posting => {
             if (posting) {
                 postings.push(posting);
@@ -94,7 +92,6 @@ router.post("/submit", async (req, res) => {
 
         //first, check for existing submission
         Assignment.findOne({ studentId: ObjectId(req.body.student_id), posting: ObjectId(req.body.posting_id) }).then(assignment => {
-            console.log(JSON.stringify(assignment));
             if(assignment) {
                 
                 //remove existing assignment from student assignments array
@@ -179,7 +176,6 @@ router.post("/submit", async (req, res) => {
 // @desc Create new post
 // @access Public
 router.post("/new", (req, res) => {
-    console.log(Date(req.body.date));
     Course.findById(req.body.course).then(course => {
         
         if (!course) {

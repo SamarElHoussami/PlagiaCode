@@ -13,7 +13,6 @@ import CoursePage from './CoursePage';
 class Routing extends React.Component {
   constructor(props) {
     super(props);
-    console.log("router: " + JSON.stringify(props));
   }
 
   render() {

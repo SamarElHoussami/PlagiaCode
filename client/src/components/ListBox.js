@@ -10,7 +10,6 @@ class ListBox extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log(JSON.stringify(props));
         this.state = {
             user: JSON.parse(localStorage.getItem('user')),
             type: props.type,
@@ -56,7 +55,6 @@ class ListBox extends React.Component {
     ************************************************** */
 
     componentWillMount() {
-        console.log(this.state.list);
         this.getCourses(); 
         this.renderOpts();
         this.getStudents();
@@ -129,7 +127,6 @@ class ListBox extends React.Component {
     getObjFromName(name, list) {
         for(var item in list) {
             if(list[item].name == name) {
-                console.log(JSON.stringify(list[item]) + " matched");
                 return list[item];
             }
         }
@@ -183,7 +180,6 @@ class ListBox extends React.Component {
     ************************************************** */
 
     render() {
-        console.log(this.state.allCourses);
         if(this.state.loading === 3) {
             return (
                 <Fragment>  
@@ -272,7 +268,6 @@ class ListBox extends React.Component {
         let userCourses = {
             "courses": this.state.list
         }
-        console.log("before api request " + JSON.stringify(userCourses));
         fetch('http://localhost:5000/api/courses/my-courses', {
             method: "POST",
             body: JSON.stringify(userCourses),
@@ -286,7 +281,6 @@ class ListBox extends React.Component {
                 return false;
             } else {
                 response.json().then(data => {
-                    console.log("Successful" + JSON.stringify(data));
                     this.setState({
                         myCourseNames: data,
                         loading: this.state.loading + 1
@@ -313,7 +307,6 @@ class ListBox extends React.Component {
                 return false;
             } else {
                 response.json().then(data => {
-                    console.log("Successful" + JSON.stringify(data));
                     
                     var studentOpts = [];
                     var studentObj = [];
@@ -329,7 +322,6 @@ class ListBox extends React.Component {
                     }
 
                     for(var i in data) {
-                        console.log("students in data: " + JSON.stringify(data[i].name))
                         studentOpts.push(<option key={data[i]._id} value={data[i].name}>{data[i].name}</option>);
                         studentObj.push(data[i]);      
                     }
@@ -349,7 +341,6 @@ class ListBox extends React.Component {
 
     //gets all courses and renders select input for them
     renderOpts() {
-        console.log("rendering course opts");
         fetch('http://localhost:5000/api/courses/all', {
             method: "GET",
             headers: {
@@ -361,7 +352,6 @@ class ListBox extends React.Component {
                 console.log("AFTER API CALL FOR COURSES: " + response.data);
             } else {
                 response.json().then(data => {
-                    console.log("Successful" + JSON.stringify(data));
 
                     var listOpts = [];
                     var courseObj = [];
@@ -377,12 +367,9 @@ class ListBox extends React.Component {
                     }
 
                     for(var i in data) {
-                        console.log("course in data: " + JSON.stringify(data[i].name))
                         listOpts.push(<option key={data[i]._id} value={data[i].name}>{data[i].name}</option>);
                         courseObj.push(data[i]);      
                     }
-
-                    console.log(courseObj);
 
                     this.setState({
                             courseOpts: listOpts,
@@ -480,7 +467,6 @@ class ListBox extends React.Component {
 
     //removes course
      removeCourse(course) {
-        console.log("removing " + course.name)
         let data = {
             course: course,
             user: this.state.user

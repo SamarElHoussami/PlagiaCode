@@ -146,9 +146,8 @@ class CoursePage extends React.Component {
     hasCourse() {
         let hasCourse = false;
         this.state.user.courses.forEach(course_id => {
-            console.log(course_id + " " + this.state.courseId);
+            //console.log(course_id + " " + this.state.courseId);
             if(course_id.localeCompare(this.state.courseId) === 0) {
-                console.log("found");
                 hasCourse = true;
                 return hasCourse;
             }
@@ -156,14 +155,12 @@ class CoursePage extends React.Component {
         if(hasCourse) {
             return true;
         } else {
-            console.log("?")
             return false;
         }
     }
 
     viewSubmissions(curPosting) {
         let subs = null;
-        console.log(this.state.submissions && this.state.submissions.length);
         
         if(this.state.submissions !== null) {
             {console.log(window.location.origin)}
@@ -229,12 +226,10 @@ class CoursePage extends React.Component {
 
     renderDetailModal() {
         if(this.state.modalFor === "postings") {
-            console.log(this.state.postings);
             let curPosting = null;
             for (let i in this.state.postings) {
                 if(this.state.postings[i]._id == this.state.selectId) {
                     curPosting = this.state.postings[i];
-                    console.log(this.state.postings[i]);
                     break;
                 }
             }
@@ -313,7 +308,6 @@ class CoursePage extends React.Component {
     }
 
     renderNames(object) {
-        console.log("rendering " + object + ": " +  this.state[object])
         let listItems = null;
         if(this.state[object] !== null && this.state[object] != undefined) {
             return listItems = this.state[object].map((item) => 
@@ -398,7 +392,6 @@ class CoursePage extends React.Component {
                                 <ul className={styles.listItem}>{this.renderNames("postings")}</ul>
                             </Col>
                         </Row>
-                        {console.log(this.hasCourse())}
                         <Row xs={12}>{this.state.user.type === "Student" ? 
                             (this.hasCourse() && <Button style={{margin: "auto"}} variant="danger" onClick={event => this.setState({removeCourse: this.state.course})}>Remove Course</Button>) ||
                             (!this.hasCourse() && <Button style={{margin: "auto"}} variant="primary" onClick={event => this.addCourse(this.state.course)}>Add Course</Button>) :
@@ -456,7 +449,6 @@ class CoursePage extends React.Component {
 
     //get users from IDs references in this course
     getUser(user) {
-        console.log(this.state.course[user]);
         if(this.state.course[user] !== null) {
             let list = null;
             if(this.state.course[user].length <= 2) {
@@ -468,8 +460,6 @@ class CoursePage extends React.Component {
                     user_ids: [this.state.course[user]]
                 }
             }
-
-            console.log(JSON.stringify(list));
 
             fetch('http://localhost:5000/api/users/find-user', {
                 method: "POST",
@@ -503,7 +493,6 @@ class CoursePage extends React.Component {
             let coursePostings = {
                 posting_ids: this.state.course.postings
             }
-            console.log("before api request " + JSON.stringify(coursePostings));
             fetch('http://localhost:5000/api/postings/course-postings', {
                 method: "POST",
                 body: JSON.stringify(coursePostings),
@@ -533,7 +522,6 @@ class CoursePage extends React.Component {
 
         //adds course to user's list of courses
     addCourse(course) {
-        console.log("adding course");
         if(!this.state.user.courses.includes(this.state.courseId)) {
             let addedCourse = {
                 name: course.name,
@@ -618,15 +606,13 @@ class CoursePage extends React.Component {
         data.append('student_name', this.state.user.name);
         data.append('posting_id', this.state.selectId);
 
-        console.log(data);
-
         fetch('http://localhost:5000/api/postings/submit', {
                 method: "POST",
                 body: data,
 
             }).then(response => {
                 
-                    console.log("uploaded");
+                    alert("Assignment successfully uploaded");
                     this.handleClose();
             }).catch(err => {
                 console.log('caught it!',err);
@@ -636,7 +622,6 @@ class CoursePage extends React.Component {
 
     //get submissions of course we're trying to load
     getSubmissions(curPosting) { 
-        console.log(curPosting);
         return fetch(`http://localhost:5000/api/postings/submissions/${curPosting}`, {
             method: "GET",
             headers: {
@@ -698,7 +683,6 @@ class CoursePage extends React.Component {
 
     //removes course
      removeCourse(course) {
-        console.log("removing " + course.name)
         let data = {
             course: course,
             user: this.state.user

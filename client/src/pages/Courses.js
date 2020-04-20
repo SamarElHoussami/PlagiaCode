@@ -115,7 +115,6 @@ class Courses extends React.Component {
                 })
             } else {
                 response.json().then(data => {
-                    console.log("Successful" + JSON.stringify(data));
 
                     this.setState({
                         allCourses: data,

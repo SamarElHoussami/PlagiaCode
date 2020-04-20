@@ -23,8 +23,6 @@ class Dashboard extends Component {
             taCourses: null
         }
 
-        console.log(this.state.loggedInStatus + " ?");
-
         this.renderMyClasses = this.renderMyClasses.bind(this);
         this.renderMyTaClasses = this.renderMyTaClasses.bind(this);
         this.authenticated = this.authenticated.bind(this);
@@ -32,13 +30,11 @@ class Dashboard extends Component {
 
     componentWillMount() {
         if(this.authenticated()) {
-            console.log("is authenticated");
             this.setState({
                 user: JSON.parse(localStorage.getItem('user')),
             })
         } else {
             this.props.history.push("/login");
-            console.log("done:)");
         }
     }
 
@@ -81,9 +77,7 @@ class Dashboard extends Component {
     //course info will depend on view (student or teacher)
 
     authenticated() {
-        console.log("again: " + this.state.loggedInStatus);
         if(this.state.loggedInStatus === "false") {
-            console.log("going to login");
             return false;
         }  else {
             //this.getCourses();
