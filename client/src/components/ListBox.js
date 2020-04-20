@@ -497,9 +497,10 @@ class ListBox extends React.Component {
                 console.log("error: " + response.data);
             } else {
                 response.json().then(data => {
-                    var removedCourse = this.state.allCourses.filter(function(e) {if(e._id.localeCompare(course._id) !== 0) {return e}});
+                    var removedCourse = this.state.allCourses.filter(function(e) {if(e._id.localeCompare(course._id) !== 0) {return e}})
+                    var removedCourseIds = removedCourse.map((item) => { return item._id});
                     var updatedUser = this.state.user;
-                    updatedUser.courses = removedCourse;
+                    updatedUser.courses = removedCourseIds;
 
                     this.props.handleUpdate(updatedUser);
 

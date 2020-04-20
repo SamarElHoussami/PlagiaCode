@@ -144,12 +144,26 @@ class CoursePage extends React.Component {
     }
 
     hasCourse() {
-        if(this.state.user.courses.includes(this.state.courseId)) return true
-        return false;
+        let hasCourse = false;
+        this.state.user.courses.forEach(course_id => {
+            console.log(course_id + " " + this.state.courseId);
+            if(course_id.localeCompare(this.state.courseId) === 0) {
+                console.log("found");
+                hasCourse = true;
+                return hasCourse;
+            }
+        });
+        if(hasCourse) {
+            return true;
+        } else {
+            console.log("?")
+            return false;
+        }
     }
 
     viewSubmissions(curPosting) {
         let subs = null;
+        console.log(this.state.submissions && this.state.submissions.length);
         
         if(this.state.submissions !== null) {
             {console.log(window.location.origin)}
@@ -225,7 +239,7 @@ class CoursePage extends React.Component {
                 }
             }
 
-            if(this.state.user.type == "Teacher" && this.state.submissions === null) this.getSubmissions(curPosting._id);
+            if((this.state.user.type == "Teacher" || this.isTa(this.state.ta, this.state.user)) && this.state.submissions === null) this.getSubmissions(curPosting._id);
 
             return (
                 <Modal size="lg" aria-labelledby="contained-modal-title-vcenter" centered show={this.state.show && this.state.modalFor === "postings"} onHide={this.handleClose}>
@@ -384,9 +398,10 @@ class CoursePage extends React.Component {
                                 <ul className={styles.listItem}>{this.renderNames("postings")}</ul>
                             </Col>
                         </Row>
+                        {console.log(this.hasCourse())}
                         <Row xs={12}>{this.state.user.type === "Student" ? 
-                            this.hasCourse() && <Button style={{margin: "auto"}} variant="danger" onClick={event => this.setState({removeCourse: this.state.course})}>Remove Course</Button> ||
-                            !this.hasCourse() && <Button style={{margin: "auto"}} variant="primary" onClick={event => this.addCourse(this.state.course)}>Add Course</Button> :
+                            (this.hasCourse() && <Button style={{margin: "auto"}} variant="danger" onClick={event => this.setState({removeCourse: this.state.course})}>Remove Course</Button>) ||
+                            (!this.hasCourse() && <Button style={{margin: "auto"}} variant="primary" onClick={event => this.addCourse(this.state.course)}>Add Course</Button>) :
                             this.hasCourse() && <Button style={{margin: "auto"}} variant="danger" onClick={event => this.setState({removeCourse: this.state.course})}>Delete Course</Button>
                         }</Row>
                     </Container>  
@@ -538,7 +553,6 @@ class CoursePage extends React.Component {
                 } else {
                     response.json().then(data => {
                         this.props.handleUpdate(data.user);
-                        console.log("user: " + data.user.name + " added course: " + data.course.name);
                         window.location.reload(false);
                     })
                 }
@@ -643,7 +657,8 @@ class CoursePage extends React.Component {
     }
 
     handleSubmitCompare() {
-        if(!this.state.submissions.length == 1) {
+        //console.log(JSON.stringify(this.state.submissions) + " " + this.state.submissions.length);
+        if(!(this.state.submissions.length === 1 && this.state.toCompare.length === 1)) {
             let files = {};
             if(this.state.toCompare.length == 2) {
                 files = {
@@ -705,7 +720,6 @@ class CoursePage extends React.Component {
                         var updatedCourses = this.state.user.courses.filter(function(e) {if(e.toString().localeCompare(course._id) !== 0) {return e}})
                         var updatedUser = this.state.user;
                         updatedUser.courses = updatedCourses;
-                        console.log("updated: " + updatedUser);
                         this.props.handleUpdate(updatedUser);
                         this.props.history.push({
                             pathname: '/dashboard'
@@ -714,7 +728,6 @@ class CoursePage extends React.Component {
                         var updatedCourses = this.state.user.courses.filter(function(e) {if(e.toString().localeCompare(course._id) !== 0) {return e}})
                         var updatedUser = this.state.user;
                         updatedUser.courses = updatedCourses;
-                        console.log("updated: " + updatedUser);
                         this.props.handleUpdate(updatedUser);
                         window.location.reload(false);
                     }
