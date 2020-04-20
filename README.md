@@ -32,3 +32,37 @@ to assignments
 
 ## 499 Final Project Course
 
+
+## Installation Instructions
+````javascript
+// Clone this repo 
+git clone https://github.com/solidsnacks/Picfolio.git
+
+// Change to Picfolio directory
+cd Picfolio
+
+// Install server dependencies in Picfolio root directory
+npm install
+
+// Change into client folder
+cd client
+
+// Install client dependencies
+npm install
+
+// Go back to root directory
+cd ..
+
+// In the /config/keys.js file
+// Note: mongoURI can be for remote database or local mongoDB instance
+// Note: tokenSecret can be any string, like "secret"
+{
+  mongoURI: 'YOUR_MONGO_URI',
+  secretOrKey: 'SOME_TOKEN_SECRET'
+}
+
+// Run server and client concurrently
+// server will run on http://localhost:5000
+// client will run on http://localhost:3000
+npm run dev
+````
