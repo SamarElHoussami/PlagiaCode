@@ -248,13 +248,16 @@ class ListBox extends React.Component {
 
                     {this.confirmRemoveCourse()}
                 </Fragment>
-            )} else {
+            )} else if(this.state.type === "courses"){
             return (
                 <div className={styles.loading}>
-                    <ReactLoading type={"bars"} color={"#333a41"} height={'20%'} width={'20%'} />
+                    <ReactLoading type={"bubbles"} color={"#f3abcb"} height={'20%'} width={'20%'} />
                 </div>
             )
+        } else {
+            return null;
         }
+
     }
 
     /**************************************************
@@ -475,7 +478,7 @@ class ListBox extends React.Component {
 
     }
 
-        //creats new course
+    //removes course
      removeCourse(course) {
         console.log("removing " + course.name)
         let data = {
@@ -494,10 +497,12 @@ class ListBox extends React.Component {
                 console.log("error: " + response.data);
             } else {
                 response.json().then(data => {
-                    this.props.handleUpdate(data.user);
-                    console.log(data);
                     var removedCourse = this.state.allCourses.filter(function(e) {if(e._id.localeCompare(course._id) !== 0) {return e}});
-                    console.log("og: " + this.state.allCourses + "\nremoved: " + removedCourse);
+                    var updatedUser = this.state.user;
+                    updatedUser.courses = removedCourse;
+
+                    this.props.handleUpdate(updatedUser);
+
                     var removedCourseName = this.state.myCourseNames.filter(function(e) {if(e.localeCompare(course.name) !== 0) {return e}});
                     this.setState({
                         allCourses: removedCourse,

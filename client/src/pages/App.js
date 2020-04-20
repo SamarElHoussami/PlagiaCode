@@ -29,6 +29,7 @@ class App extends React.Component {
   }
 
   handleUpdate(data) {
+    console.log("updating user")
     this.setState({
       loggedInStatus: "true"
     });

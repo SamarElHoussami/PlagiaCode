@@ -21,7 +21,6 @@ class Courses extends React.Component {
         }
 
         this.getAll = this.getAll.bind(this);
-        this.handleAdd = this.handleAdd.bind(this);
         this.renderCourses = this.renderCourses.bind(this);
     }
 
@@ -47,7 +46,7 @@ class Courses extends React.Component {
                             }
                         });
                     }}
-                ><p>{course.name}</p></a>
+                ><p><b>{course.name}</b> Course code: {course.code}</p></a>
             );
             this.setState({
                 listItems: listItems
@@ -88,7 +87,7 @@ class Courses extends React.Component {
         } else {
             return (
                 <div className={courseStyles.loading}>
-                    <ReactLoading type={"bars"} color={"#333a41"} height={'20%'} width={'20%'} />
+                    <ReactLoading type={"bubbles"} color={"#f3abcb"} height={'20%'} width={'20%'} />
                 </div>
             )
         }
@@ -130,48 +129,6 @@ class Courses extends React.Component {
                 error: err
             })
         });
-    }
-
-    //adds course to user's list of courses
-    handleAdd() {
-        if(!this.state.myCourseNames.includes(this.state.selectValue) && this.state.selectValue !== 0) {
-       
-        let addedCourse = {
-            name: this.state.selectValue,
-            user: this.state.user
-        } 
-
-        fetch('http://localhost:5000/api/courses/add', {
-            method: "POST",
-            body: JSON.stringify(addedCourse),
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            }
-        }).then(response => {
-            if(!response.ok) {
-                console.log("error: " + response.data);
-            } else {
-                response.json().then(data => {
-                    this.props.handleUpdate(data.user);
-                    var joined = this.state.myCourseNames.concat(data.course.name)
-                    
-                    this.setState({
-                        myCourseNames: joined,
-                        renderCourses: true
-                    })
-
-                    this.handleClose();
-                })
-            }
-        }).catch(err => {
-            console.log('caught it!',err);
-            this.handleClose();
-        });
-        } else {
-            console.log("course already added")
-            this.handleClose();
-        }
     }
 }
 

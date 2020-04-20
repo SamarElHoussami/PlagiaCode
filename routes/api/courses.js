@@ -204,6 +204,7 @@ router.post("/remove", async (req, res) => {
     let user = req.body.user;
     let course = req.body.course;
     let updatedUser = null;
+    let updatedCourse = null;
 
     //if user is teacher, delete course from everywhere
     if(user.type == "Teacher") {
@@ -279,12 +280,35 @@ router.post("/remove", async (req, res) => {
         return res;
     } else {
         if(user.type == "Student") {
-            User.findById( user._id ).then(user => {
-                if(users) console.log("removing course from " + user);
+            User.findById(ObjectId(user._id)).then(user => {
+                if(user) {
+                    var removedCourse = user.courses.filter(function(e) { if(e.toString().localeCompare(course._id.toString()) !== 0) { return e; } });
+                    user.courses = removedCourse;
+                    user.save(function (err) {
+                        if(err) {
+                            console.error('ERROR!' + err);
+                            return res.status(400).json({ error: "problem deleting course from ta" });
+                        }
+                    })
+                }
             })
-        }
 
-        return res.json("successfully deleted course")
+            //remove student from course
+            Course.findById(ObjectId(course._id)).then(course => {
+                if(course) {
+                    var removedStudent = course.students.filter(function(e) { if(e.toString().localeCompare(user._id.toString()) !== 0) { return e; } });
+                    course.students = removedStudent;
+                    course.save(function (err) {
+                        if(err) {
+                            console.error('ERROR!' + err);
+                            return res.status(400).json({ error: "problem deleting student from course" });
+                        }
+                    })
+                }
+            
+            })
+            return res.json("successfully removed course");
+        }
     }
 
 });

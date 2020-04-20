@@ -30,7 +30,8 @@ class CoursePage extends React.Component {
             postDesc: '',
             postDate: new Date(),
             toCompare: [],
-            submissions: null
+            submissions: null,
+            removeCourse: null
 
         }
         this.getUser = this.getUser.bind(this);
@@ -54,6 +55,11 @@ class CoursePage extends React.Component {
         this.isLate = this.isLate.bind(this);
         this.renderCompareButton = this.renderCompareButton.bind(this);
         this.handleSubmitCompare = this.handleSubmitCompare.bind(this);
+        this.hasCourse = this.hasCourse.bind(this);
+        this.confirmRemoveCourse = this.confirmRemoveCourse.bind(this);
+        this.removeCourse = this.removeCourse.bind(this);
+        this.removeCourse = this.removeCourse.bind(this);
+        this.addCourse = this.addCourse.bind(this);
 
     }
 
@@ -78,6 +84,7 @@ class CoursePage extends React.Component {
     ************************************************** */
 
     loadPage() {
+        
         this.getUser("teacher");
         this.getUser("students");
         this.getUser("ta");
@@ -120,7 +127,8 @@ class CoursePage extends React.Component {
             modalFor: null,
             selectId: null,
             submissions: null,
-            toCompare: []
+            toCompare: [],
+            removeCourse: null
         })
     }
 
@@ -133,6 +141,11 @@ class CoursePage extends React.Component {
 
     isTa(courseTa, student) {
         return courseTa[0]._id.localeCompare(student._id) === 0;
+    }
+
+    hasCourse() {
+        if(this.state.user.courses.includes(this.state.courseId)) return true
+        return false;
     }
 
     viewSubmissions(curPosting) {
@@ -318,6 +331,30 @@ class CoursePage extends React.Component {
         )
     }
     
+    confirmRemoveCourse() {
+        let course = this.state.removeCourse;
+
+        if(course !== null) return(
+        <Modal size="lg" aria-labelledby="contained-modal-title-vcenter"centered show={course !== null} onHide={this.handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title className={styles.modalTitle}>Are you sure you want to remove the following course?</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <p><b>Course name:</b> {course.name}</p>
+                <p><b>Course Code:</b> {course.code}</p>
+            </Modal.Body>
+            
+            <Modal.Footer>
+                <Button variant="secondary" onClick={this.handleClose}>
+                    Cancel
+                </Button>
+                <Button variant="danger" onClick={this.removeCourse.bind(this, course)}>
+                    Remove
+                </Button>
+            </Modal.Footer>
+        </Modal>
+        );
+    }
 
     /**************************************************
     
@@ -327,7 +364,6 @@ class CoursePage extends React.Component {
 
     render() {
         if(this.state.course !== null && this.state.loading == 5) {
-        console.log(this.isTa(this.state.ta, this.state.user));
             return (
                 <Fragment>
                     <div className={styles.bgHeader}>
@@ -338,28 +374,33 @@ class CoursePage extends React.Component {
                     </div>
                     <Container>
                         <Row xs={12}>
-                        <Col xs={6}>
-                            <p><b>Teacher:</b></p> <ul>{this.renderNames("teacher")}</ul>
-                            <p><b>Ta:</b></p><ul>{this.renderNames("ta")}</ul>
-                            <p><b>Students:</b></p><ul>{this.renderNames("students")}</ul>
-                        </Col> 
-                        <Col xs={6}>
-                            <p><b>Assignments:</b> {this.state.user.type === "Teacher" ? this.renderCreatePostButton() : null}</p>
-                            <ul className={styles.listItem}>{this.renderNames("postings")}</ul>
-                        </Col>
+                            <Col xs={6}>
+                                <p><b>Teacher:</b></p> <ul>{this.renderNames("teacher")}</ul>
+                                <p><b>Ta:</b></p><ul>{this.renderNames("ta")}</ul>
+                                <p><b>Students:</b></p><ul>{this.renderNames("students")}</ul>
+                            </Col> 
+                            <Col xs={6}>
+                                <p><b>Assignments:</b> {this.state.user.type === "Teacher" && this.hasCourse()? this.renderCreatePostButton() : null}</p>
+                                <ul className={styles.listItem}>{this.renderNames("postings")}</ul>
+                            </Col>
                         </Row>
-
+                        <Row xs={12}>{this.state.user.type === "Student" ? 
+                            this.hasCourse() && <Button style={{margin: "auto"}} variant="danger" onClick={event => this.setState({removeCourse: this.state.course})}>Remove Course</Button> ||
+                            !this.hasCourse() && <Button style={{margin: "auto"}} variant="primary" onClick={event => this.addCourse(this.state.course)}>Add Course</Button> :
+                            this.hasCourse() && <Button style={{margin: "auto"}} variant="danger" onClick={event => this.setState({removeCourse: this.state.course})}>Delete Course</Button>
+                        }</Row>
                     </Container>  
 
                     {this.renderDetailModal()}
                     {this.renderCreateModal()}
+                    {this.confirmRemoveCourse()}
 
                 </Fragment>
             );
         } else {
             return (
                 <div className={styles.loading}>
-                    <ReactLoading type={"bars"} color={"#333a41"} height={'20%'} width={'20%'} />
+                    <ReactLoading type={"bubbles"} color={"#f3abcb"} height={'20%'} width={'20%'} />
                 </div>
             )
         }
@@ -474,6 +515,43 @@ class CoursePage extends React.Component {
             })
         }
     }
+
+        //adds course to user's list of courses
+    addCourse(course) {
+        console.log("adding course");
+        if(!this.state.user.courses.includes(this.state.courseId)) {
+            let addedCourse = {
+                name: course.name,
+                user: this.state.user
+            } 
+
+            fetch('http://localhost:5000/api/courses/add', {
+                method: "POST",
+                body: JSON.stringify(addedCourse),
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
+                }
+            }).then(response => {
+                if(!response.ok) {
+                    console.log("error: " + response.data);
+                } else {
+                    response.json().then(data => {
+                        this.props.handleUpdate(data.user);
+                        console.log("user: " + data.user.name + " added course: " + data.course.name);
+                        window.location.reload(false);
+                    })
+                }
+            }).catch(err => {
+                console.log('caught it!',err);
+                this.handleClose();
+            });
+        } else {
+            alert("course already added")
+            this.handleClose();
+        }
+    }
+
 
     //create a new post given name, description, and date
     createPost() {
@@ -601,6 +679,51 @@ class CoursePage extends React.Component {
         } else {
             alert("Error: Cannot check for plagiarism with only one submission");
         }
+    }
+
+    //removes course
+     removeCourse(course) {
+        console.log("removing " + course.name)
+        let data = {
+            course: course,
+            user: this.state.user
+        }
+         fetch('http://localhost:5000/api/courses/remove', {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            if(!response.ok) {
+                console.log("error: " + response.data);
+            } else {
+                response.json().then(data => {
+                    
+                    if(this.state.user.type === "Teacher") {
+                        var updatedCourses = this.state.user.courses.filter(function(e) {if(e.toString().localeCompare(course._id) !== 0) {return e}})
+                        var updatedUser = this.state.user;
+                        updatedUser.courses = updatedCourses;
+                        console.log("updated: " + updatedUser);
+                        this.props.handleUpdate(updatedUser);
+                        this.props.history.push({
+                            pathname: '/dashboard'
+                        });
+                    } else {
+                        var updatedCourses = this.state.user.courses.filter(function(e) {if(e.toString().localeCompare(course._id) !== 0) {return e}})
+                        var updatedUser = this.state.user;
+                        updatedUser.courses = updatedCourses;
+                        console.log("updated: " + updatedUser);
+                        this.props.handleUpdate(updatedUser);
+                        window.location.reload(false);
+                    }
+                })
+            }
+        }).catch(err => {
+            console.log('caught it!',err);
+        });
+
     }
 }
 
