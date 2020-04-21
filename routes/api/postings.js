@@ -207,7 +207,12 @@ router.post("/new", (req, res) => {
 // @desc Check for plagiarsim between two files
 // @access Public
 router.post("/plagiarism-check", (req, res) => {
-    const first_text = fs.readFileSync("client/public" + req.body.first, 'utf8');
+    const dir = process.cwd();
+    const firstFile = req.body.first;
+
+    try {
+        const first_text = fs.readFileSync("client/public" + req.body.first, 'utf8');
+    } catch(err) { return res.status(400).json({message: "file was not found at: " + dir + "/client/public" + firstFile})};
 
     //if 2 assignments were selected or only 2 assignments were submitted
     if(!Array.isArray(req.body.second) || req.body.second.length === 2) {
@@ -215,7 +220,7 @@ router.post("/plagiarism-check", (req, res) => {
         //compare both texts
         var result = stringSimilarity.compareTwoStrings(first_text, second_text); 
         var message = "The assignments are " + (result*100).toFixed(2) + "% similar.";
-        return res.json({message: message});
+        return res.json({message: message, directory: dir});
     } else {
         //get all assignments that are not the selected assignment
         var submissions = req.body.second.filter(function(e) { if(e.filePath.toString().localeCompare(req.body.first) !== 0) { return e; }})
@@ -225,7 +230,7 @@ router.post("/plagiarism-check", (req, res) => {
         //find best match
         var fileName = getNameFromText(result.bestMatch.target, result, submissions);
         var message = "The selected assignment is most similar to " + fileName + " with " + (result.bestMatch.rating*100).toFixed(2) + "% similarity.";
-        return res.json({message: message});
+        return res.json({message: message, directory: dir});
     }
     
     function getNameFromText(text, result, submissions) {

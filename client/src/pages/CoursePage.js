@@ -244,7 +244,7 @@ class CoursePage extends React.Component {
                     <Modal.Body>
                     <div>
         
-                        <p><b>Assignmet Name:</b> {curPosting.name}</p>
+                        <p><b>Assignment Name:</b> {curPosting.name}</p>
         
                         <p><b>Assignment Description:</b><br/>{curPosting.description}</p>
                     
@@ -435,7 +435,6 @@ class CoursePage extends React.Component {
             }
         }).then(response => {
             response.json().then(data => {
-                console.log("Successful" + JSON.stringify(data));
                 this.setState({
                     course: data,
                     loading: this.state.loading + 1
@@ -470,7 +469,6 @@ class CoursePage extends React.Component {
                 }
             }).then(response => {
                 response.json().then(data => {
-                    console.log("Successful" + JSON.stringify(data));
                     this.setState({
                         [user]: data,
                         loading: this.state.loading + 1
@@ -502,7 +500,6 @@ class CoursePage extends React.Component {
                 }
             }).then(response => {
                 response.json().then(data => {
-                    console.log("Successful" + JSON.stringify(data));
                     this.setState({
                         postings: data,
                         loading: this.state.loading + 1
