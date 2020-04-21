@@ -42,7 +42,7 @@ class Login extends Component {
   handleFormSubmit(e) {
     e.preventDefault();
     let userData = this.state.User;
-    fetch('http://localhost:5000/api/users/login', {
+    fetch('/api/users/login', {
       method: "POST",
       body: JSON.stringify(userData),
       headers: {

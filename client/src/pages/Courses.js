@@ -101,7 +101,7 @@ class Courses extends React.Component {
 
     //gets all courses and renders select input for them
     getAll() {
-        fetch('http://localhost:5000/api/courses/all', {
+        fetch('/api/courses/all', {
             method: "GET",
             headers: {
                 Accept: "application/json",

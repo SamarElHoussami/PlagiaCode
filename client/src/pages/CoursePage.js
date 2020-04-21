@@ -426,7 +426,7 @@ class CoursePage extends React.Component {
             id: this.state.courseId
         }
     
-        return fetch('http://localhost:5000/api/courses/find', {
+        return fetch('/api/courses/find', {
             method: "POST",
             body: JSON.stringify(course),
             headers: {
@@ -461,7 +461,7 @@ class CoursePage extends React.Component {
                 }
             }
 
-            fetch('http://localhost:5000/api/users/find-user', {
+            fetch('api/users/find-user', {
                 method: "POST",
                 body: JSON.stringify(list),
                 headers: {
@@ -493,7 +493,7 @@ class CoursePage extends React.Component {
             let coursePostings = {
                 posting_ids: this.state.course.postings
             }
-            fetch('http://localhost:5000/api/postings/course-postings', {
+            fetch('/api/postings/course-postings', {
                 method: "POST",
                 body: JSON.stringify(coursePostings),
                 headers: {
@@ -528,7 +528,7 @@ class CoursePage extends React.Component {
                 user: this.state.user
             } 
 
-            fetch('http://localhost:5000/api/courses/add', {
+            fetch('/api/courses/add', {
                 method: "POST",
                 body: JSON.stringify(addedCourse),
                 headers: {
@@ -572,7 +572,7 @@ class CoursePage extends React.Component {
                 date: postDate
             }
 
-            fetch('http://localhost:5000/api/postings/new', {
+            fetch('/api/postings/new', {
                 method: "POST",
                 body: JSON.stringify(newPost),
                 headers: {
@@ -606,7 +606,7 @@ class CoursePage extends React.Component {
         data.append('student_name', this.state.user.name);
         data.append('posting_id', this.state.selectId);
 
-        fetch('http://localhost:5000/api/postings/submit', {
+        fetch('/api/postings/submit', {
                 method: "POST",
                 body: data,
 
@@ -622,7 +622,7 @@ class CoursePage extends React.Component {
 
     //get submissions of course we're trying to load
     getSubmissions(curPosting) { 
-        return fetch(`http://localhost:5000/api/postings/submissions/${curPosting}`, {
+        return fetch(`/api/postings/submissions/${curPosting}`, {
             method: "GET",
             headers: {
                 Accept: "application/json",
@@ -662,7 +662,7 @@ class CoursePage extends React.Component {
                 }
             }
 
-            fetch('http://localhost:5000/api/postings/plagiarism-check', {
+            fetch('/api/postings/plagiarism-check', {
                     method: "POST",
                     body: JSON.stringify(files),
                     headers: {
@@ -687,7 +687,7 @@ class CoursePage extends React.Component {
             course: course,
             user: this.state.user
         }
-         fetch('http://localhost:5000/api/courses/remove', {
+         fetch('/api/courses/remove', {
             method: "POST",
             body: JSON.stringify(data),
             headers: {

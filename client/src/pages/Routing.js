@@ -19,10 +19,9 @@ class Routing extends React.Component {
     return (
       <Router>
           <Switch>
-            <Route exact path="/" path="/dashboard" render={props => (
-                <Dashboard
+            <Route exact path="/" render={props => (
+                <Login
                   {...props}
-                  handleUpdate={this.props.handleUpdate}
                   handleLogin={this.props.handleLogin}
                   handleLogout={this.props.handleLogout}
                   loggedInStatus={this.props.loggedInStatus}

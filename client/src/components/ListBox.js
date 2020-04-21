@@ -268,7 +268,7 @@ class ListBox extends React.Component {
         let userCourses = {
             "courses": this.state.list
         }
-        fetch('http://localhost:5000/api/courses/my-courses', {
+        fetch('/api/courses/my-courses', {
             method: "POST",
             body: JSON.stringify(userCourses),
             headers: {
@@ -295,7 +295,7 @@ class ListBox extends React.Component {
 
     //gets all students and renders select input for them
     getStudents() {
-        fetch('http://localhost:5000/api/users/students', {
+        fetch('/api/users/students', {
             method: "GET",
             headers: {
                 Accept: "application/json",
@@ -341,7 +341,7 @@ class ListBox extends React.Component {
 
     //gets all courses and renders select input for them
     renderOpts() {
-        fetch('http://localhost:5000/api/courses/all', {
+        fetch('/api/courses/all', {
             method: "GET",
             headers: {
                 Accept: "application/json",
@@ -392,7 +392,7 @@ class ListBox extends React.Component {
             user: this.state.user
         } 
 
-        fetch('http://localhost:5000/api/courses/add', {
+        fetch('/api/courses/add', {
             method: "POST",
             body: JSON.stringify(addedCourse),
             headers: {
@@ -434,7 +434,7 @@ class ListBox extends React.Component {
             teacher: this.state.user._id,
             ta: this.state.courseTa !== 0 ? this.getObjFromName(this.state.courseTa, this.state.allStudents)._id : ''
         }
-         fetch('http://localhost:5000/api/courses/new', {
+         fetch('/api/courses/new', {
             method: "POST",
             body: JSON.stringify(data),
             headers: {
@@ -471,7 +471,7 @@ class ListBox extends React.Component {
             course: course,
             user: this.state.user
         }
-         fetch('http://localhost:5000/api/courses/remove', {
+         fetch('/api/courses/remove', {
             method: "POST",
             body: JSON.stringify(data),
             headers: {

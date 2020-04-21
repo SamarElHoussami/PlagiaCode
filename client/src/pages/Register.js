@@ -49,7 +49,7 @@ class Register extends Component {
   handleFormSubmit(e) {
     e.preventDefault();
     let userData = this.state.newUser;
-    fetch('http://localhost:5000/api/users/register', {
+    fetch('/api/users/register', {
       method: "POST",
       body: JSON.stringify(userData),
       headers: {
