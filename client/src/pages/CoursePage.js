@@ -70,7 +70,6 @@ class CoursePage extends React.Component {
     ************************************************** */
 
     componentWillMount() {
-        console.log("user: " + localStorage.getItem("user"));
         if(this.state.courseId !== null) {
             this.getCourse();
         } else {
@@ -176,7 +175,7 @@ class CoursePage extends React.Component {
                             onChange={this.handleCompare}
                         />
                     </label>
-                    <p><b>Assignment:</b> <a href={window.location.origin + "/" + element.filePath}>{element.name}</a></p>
+                    <p><b>Assignment:</b> <a href={window.location.origin + "/public/" + element.filePath}>{element.name}</a></p>
                     <p><b>Grade:</b> {element.grade === -1 ? "not graded" : element.grade}</p>
                     <p><b>Submitted:</b> {this.dateToText(element.date).date} {this.dateToText(element.date).time} {this.isLate(element.date, curPosting.due_date)}</p>
                     

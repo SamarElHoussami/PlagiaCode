@@ -35,7 +35,6 @@ class App extends React.Component {
     });
 
     localStorage.setItem('user', JSON.stringify(data));
-    console.log("user updated: " + localStorage.getItem("user"));
   }
 
   handleLogout() {
