@@ -50,9 +50,8 @@ app.get('/ping', function (req, res) {
 });
 
 const port = process.env.PORT || 5000; // process.env.port is Heroku's port if you choose to deploy the app there
-app.get("/public", (req, res) => {
-    res.sendFile(path.join(__dirname, "client", "build", "public"));
-});
+
+app.use(express.static(path.join(__dirname, 'client', 'build', "public")));
 
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "client", "build", "index.html"));
