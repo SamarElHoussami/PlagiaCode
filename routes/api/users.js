@@ -147,4 +147,11 @@ router.get("/students", async (req, res) => {
     return res.json(students);    
 });
 
+// @route GET api/users/test
+// @desc returns "success"
+// @access Public
+router.get("/test", async (req, res) => {
+    return res.json("success");    
+});
+
 module.exports = router;
