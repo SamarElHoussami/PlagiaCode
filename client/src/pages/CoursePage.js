@@ -70,6 +70,7 @@ class CoursePage extends React.Component {
     ************************************************** */
 
     componentWillMount() {
+        console.log("user: " + localStorage.getItem("user"));
         if(this.state.courseId !== null) {
             this.getCourse();
         } else {

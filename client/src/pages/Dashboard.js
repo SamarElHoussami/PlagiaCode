@@ -14,7 +14,7 @@ import styles from '../styles/dashboardStyle.module.css';
 class Dashboard extends Component {
     constructor(props) {
         super(props);
-        console.log("from dash: " + localStorage.getItem('loggedInStatus'));
+        console.log("from dash: " + localStorage.getItem('user'));
 
         this.state = {
             user: null,

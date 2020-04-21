@@ -25,7 +25,7 @@ class App extends React.Component {
 
     localStorage.setItem('loggedInStatus', true);
     localStorage.setItem('user', JSON.stringify(data));
-    console.log("handled login: " + JSON.stringify(data) + " " + localStorage.getItem() + " <---");
+    console.log("handled login: " + JSON.stringify(data) + " " + localStorage.getItem('user') + " <---");
 
   }
 
