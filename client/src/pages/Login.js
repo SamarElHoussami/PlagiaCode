@@ -17,7 +17,6 @@ class Login extends Component {
         password: '',
       }
     }
-    console.log("from login: " + JSON.stringify(this.props));
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
     this.handleInput = this.handleInput.bind(this)
     this.handleUserLogout = this.handleUserLogout.bind(this);
