@@ -12,6 +12,9 @@
     "build": "npm run start && npm start --prefix client",
     "heroku-postbuild": "cd client && npm install --only=dev && npm install && npm run build"
   },
+  "engines": {
+    "node": "10.15.3"
+  },
   "author": "samar el-houssami",
   "license": "ISC",
   "dependencies": {

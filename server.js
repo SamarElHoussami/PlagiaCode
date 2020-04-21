@@ -44,15 +44,13 @@ app.use("/api/courses", courses);
 app.use("/api/postings", postings);
 
 //for deployment
-app.use(favicon(__dirname + '/build/favicon.ico'));
-// the __dirname is the current directory from where the script is running
-app.use(express.static(__dirname));
-app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, 'client', 'build')));
 app.get('/ping', function (req, res) {
  return res.send('pong');
 });
-app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', '/client/index.html'));
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
 });
 
 const port = process.env.PORT || 5000; // process.env.port is Heroku's port if you choose to deploy the app there
