@@ -40,6 +40,25 @@ class Login extends Component {
   }
 
   handleFormSubmit(e) {
+    fetch('/api/users/test', {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    }).then(response => {
+      if(!response.ok) {
+        alert("server not working");
+      }
+      else {
+        response.json().then(data => {
+          return data; //return success if api works
+        })
+      }
+      }).catch(err => {
+       console.log('caught it!',err);
+      });
+      
     e.preventDefault();
     let userData = this.state.User;
     fetch('/api/users/login', {
