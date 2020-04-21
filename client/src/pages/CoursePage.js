@@ -462,7 +462,7 @@ class CoursePage extends React.Component {
                 }
             }
 
-            fetch('api/users/find-user', {
+            fetch('/api/users/find-user', {
                 method: "POST",
                 body: JSON.stringify(list),
                 headers: {
