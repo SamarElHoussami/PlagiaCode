@@ -241,43 +241,44 @@ router.post("/plagiarism-check", (req, res) => {
     Assignment.findById(ObjectId(first_id)).then(assignment => {
         first_text = assignment.file.toString();
         //console.log(first_text);
+   
+        //if 2 assignments were selected or only 2 assignments were submitted
+        if(!Array.isArray(req.body.second) || req.body.second.length === 2) {
+            second_id = req.body.second;
+            second_text = "";
+            
+            Assignment.findById(ObjectId(second_id)).then(assignment => {
+                second_text = assignment.file.toString();
+                //console.log(second_text);
+                //compare both texts
+                console.log(first_text + " " + second_text);
+                var result = stringSimilarity.compareTwoStrings(first_text, second_text); 
+                var message = "The assignments are " + (result*100).toFixed(2) + "% similar.";
+                return res.json({message: message});
+            }).catch(err => console.log(err));
+            
+        } else {
+            text_list = [];
+
+            //get all assignments that are not the selected assignment
+            var submissions = req.body.second.filter(function(e) { if(e._id.toString().localeCompare(req.body.first) !== 0) { return e; }})
+            //create an array of assignment text
+
+            Assignment.find({ _id: {$in: submissions} }).then(assignments => {
+                assignments.forEach(assignment => {
+                    text_list.push(assignment.file.toString());
+                })
+
+                var result = stringSimilarity.findBestMatch(first_text, text_list); 
+
+                //find best match
+                var fileName = getNameFromText(result.bestMatch.target, result, submissions);
+                var message = "The selected assignment is most similar to " + fileName + " with " + (result.bestMatch.rating*100).toFixed(2) + "% similarity.";
+                return res.json({message: message});
+            }).catch(err => console.log(err));
+        }
+   
     }).catch(err => console.log(err));
-
-    //if 2 assignments were selected or only 2 assignments were submitted
-    if(!Array.isArray(req.body.second) || req.body.second.length === 2) {
-        second_id = req.body.second;
-        second_text = "";
-        
-        Assignment.findById(ObjectId(second_id)).then(assignment => {
-            second_text = assignment.file.toString();
-            //console.log(second_text);
-            //compare both texts
-            console.log(first_text + " " + second_text);
-            var result = stringSimilarity.compareTwoStrings(first_text, second_text); 
-            var message = "The assignments are " + (result*100).toFixed(2) + "% similar.";
-            return res.json({message: message});
-        }).catch(err => console.log(err));
-        
-    } else {
-        text_list = [];
-
-        //get all assignments that are not the selected assignment
-        var submissions = req.body.second.filter(function(e) { if(e._id.toString().localeCompare(req.body.first) !== 0) { return e; }})
-        //create an array of assignment text
-
-        Assignment.find({ _id: {$in: submissions} }).then(assignments => {
-            assignments.forEach(assignment => {
-                text_list.push(assignment.file.toString());
-            })
-
-            var result = stringSimilarity.findBestMatch(first_text, text_list); 
-
-            //find best match
-            var fileName = getNameFromText(result.bestMatch.target, result, submissions);
-            var message = "The selected assignment is most similar to " + fileName + " with " + (result.bestMatch.rating*100).toFixed(2) + "% similarity.";
-            return res.json({message: message});
-        }).catch(err => console.log(err));
-    }
     
     function getNameFromText(text, result, submissions) {
         for(i in result.ratings) {
