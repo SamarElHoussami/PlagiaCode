@@ -150,7 +150,7 @@ class Register extends Component {
 
 const buttonStyle = {
   margin: "auto",
-  width: "80%",
+  width: "100%",
   border: "none"
 };
 
