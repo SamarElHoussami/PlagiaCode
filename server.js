@@ -54,7 +54,7 @@ const port = process.env.PORT || 5000; // process.env.port is Heroku's port if y
 if(port !== 5000) {
   app.get('/public/assignments/:assign', (req, res) => {
     const assignName = req.params.assign.substr(13);
-      res.sendFile(path.join(__dirname, "client", "build", "public", "assignments", assignName)); //for deployed
+      res.sendFile(path.join(__dirname, "client", "public", "assignments", assignName)); //for deployed
   });
 
   app.get("*", (req, res) => {

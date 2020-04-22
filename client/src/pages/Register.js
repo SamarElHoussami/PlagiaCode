@@ -136,14 +136,6 @@ class Register extends Component {
               style={buttonStyle}
             />{" "}
             {/*Submit */}
-
-            <Button
-              action={this.handleClearForm}
-              type={"secondary"}
-              title={"Clear"}
-              style={buttonStyle}
-            />{" "}
-            {/* Clear the form */}
           </div>
         </form>
 
@@ -158,8 +150,7 @@ class Register extends Component {
 
 const buttonStyle = {
   margin: "auto",
-  width: "45%",
-  backgroundColor: "#9d42b1",
+  width: "80%",
   border: "none"
 };
 

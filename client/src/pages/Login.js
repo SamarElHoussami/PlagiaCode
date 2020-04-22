@@ -148,7 +148,6 @@ const buttonStyle = {
     display: "block",
     width: "80%",
     margin: "auto",
-    backgroundColor: "#9d42b1",
     border: "none"
 };
 

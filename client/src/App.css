@@ -9,6 +9,5 @@ body {
 .react-datetime-picker__wrapper {
     border-radius: 4px;
     background-color: #e8eeef;
-    display: block;
     margin-left: 10px;
 }

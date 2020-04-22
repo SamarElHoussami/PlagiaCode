@@ -244,28 +244,27 @@ class CoursePage extends React.Component {
                     <Modal.Body>
                     <div>
         
-                        <p><b>Assignment Name:</b> {curPosting.name}</p>
+                        <p style={{textAlign: "center"}}><b>Name</b><br/>{curPosting.name}</p>
         
-                        <p><b>Assignment Description:</b><br/>{curPosting.description}</p>
+                        <p style={{textAlign: "center"}}><b>Description</b><br/>{curPosting.description}</p>
                     
-                        <p><b>Assignment Due Date:</b><br/>{this.dateToText(curPosting.due_date).date} {this.dateToText(curPosting.due_date).time}</p>
+                        <p style={{textAlign: "center"}}><b>Due Date:</b><br/>{this.dateToText(curPosting.due_date).date} {this.dateToText(curPosting.due_date).time}</p>
                         
-                        {this.state.user.type === "Student" ? 
+                        {this.state.user.type === "Student" && !this.isTa(this.state.ta, this.state.user)? 
                             <Fragment>
-                            <p><b>Submit Assignment</b></p>
-                            <form onSubmit={this.handleSubmit}>
+                            <hr/>
+                            <p style={{margin: "20px 0"}}> <b>Submit Assignment</b></p>
+                            <form>
                                 <label className={styles.formLabel}>Upload file:  </label>
                                 <input className={styles.inputText}type="file" name="file" onChange={this.fileChange} ref={this.fileInput} />
-                                <button type="submit">Submit</button>
                             </form><br/>
                             </Fragment>
                         : null }
-                        <hr/>
-                        {this.state.user.type === "Teacher" || this.isTa(this.state.ta, this.state.user)? <Fragment><h1 className={styles.modalTitle}>Student Submissions</h1>{this.viewSubmissions(curPosting)}</Fragment> : null }
+                        {this.state.user.type === "Teacher" || this.isTa(this.state.ta, this.state.user)? <Fragment><hr/><h1 className={styles.modalTitle}>Student Submissions</h1>{this.viewSubmissions(curPosting)}</Fragment> : null}
                     </div>
                     </Modal.Body>
                     <Modal.Footer className={styles.modalFooter}>
-                        {this.state.user.type === "Teacher" || this.isTa(this.state.ta, this.state.user)? this.renderCompareButton(this.state.toCompare) : null} 
+                        {this.state.user.type === "Teacher" || this.isTa(this.state.ta, this.state.user)? this.renderCompareButton(this.state.toCompare) : <Button style={{width: "100%"}} variant="primary" onClick={this.handleSubmit}>Submit</Button>} 
                     </Modal.Footer>
                 </Modal>
             );
