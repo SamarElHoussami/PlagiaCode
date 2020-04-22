@@ -232,12 +232,12 @@ router.post("/remove", async (req, res) => {
                             if(assignment){
                             
                                 //delete file from folder
-                                try {
+                                /*try {
                                     fs.unlinkSync("client/public" + assignment.filePath)
                                 } catch(err) {
                                     console.error(err)
                                     res.status(400).json({ error: "problem deleting file from folder" });
-                                }
+                                }*/
                                 
                                 //delete assignment from database
                                 assignment.remove();

@@ -163,7 +163,7 @@ class CoursePage extends React.Component {
         let subs = null;
         
         if(this.state.submissions !== null) {
-            {console.log(window.location.origin)}
+            {console.log(JSON.stringify(this.state.submissions))}
             return subs = this.state.submissions.map((element) => 
                 <div key={element.studentName}>
                     <hr className={styles.separator}/>
@@ -171,11 +171,11 @@ class CoursePage extends React.Component {
                     <label className={styles.studentCheck}>
                         <input
                             type="checkbox"
-                            name={element.filePath}
+                            name={element._id}
                             onChange={this.handleCompare}
                         />
                     </label>
-                    <p><b>Assignment:</b> <a href={window.location.origin + "/public" + element.filePath}>{element.name}</a></p>
+                    <p><b>Assignment:</b> <a href="">{element.name}</a></p>
                     <p><b>Grade:</b> {element.grade === -1 ? "not graded" : element.grade}</p>
                     <p><b>Submitted:</b> {this.dateToText(element.date).date} {this.dateToText(element.date).time} {this.isLate(element.date, curPosting.due_date)}</p>
                     
@@ -183,6 +183,27 @@ class CoursePage extends React.Component {
             ); 
         } else { return null}
     }
+
+ /*   getFile(assignment_id, filename) {
+        fetch(`/api/postings/getFile/${assignment_id}`, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            response.json().then(data => {
+                var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
+                saveAs(blob, filename);
+
+                //return 'data:text/plain;charset=utf-8,' + data;
+            })
+            
+        }).catch(err => {
+            console.log('caught it!',err);
+            return null
+        });
+    }*/
 
     isLate(subDate, dueDate) {
         let sub = new Date(subDate.substr(0,16))
@@ -371,6 +392,7 @@ class CoursePage extends React.Component {
 
     render() {
         if(this.state.course !== null && this.state.loading == 5) {
+            {console.log(this.state.toCompare)}
             return (
                 <Fragment>
                     <div className={styles.bgHeader}>
@@ -648,8 +670,8 @@ class CoursePage extends React.Component {
                 }
             } else if(this.state.submissions.length == 2) {
                 files = {
-                    first: this.state.submissions[0].filePath,
-                    second: this.state.submissions[1].filePath
+                    first: this.state.submissions[0]._id,
+                    second: this.state.submissions[1]._id
                 }
             } else{
                 files = {

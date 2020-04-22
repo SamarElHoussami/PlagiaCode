@@ -19,8 +19,8 @@ const AssignmentSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Posting'
   },
-  filePath: {
-     type: String,
+  file: {
+     type: Buffer,
      required: true
   },
   grade: {

@@ -45,6 +45,23 @@ router.get("/find", (req, res) => {
     }).catch(err => console.log(err));
 });
 
+// @route GET api/assignment/getFile/id
+// @desc Get assignment text by ID
+// @access Public
+router.get("/getFile/:id", (req, res) => {
+    // Form validation
+    const assignment_id = req.params.id
+    
+    Assignment.findById(assignment_id).then(assignment => {
+        if(!assignment) {
+            return res.status(400).json({error: "assignment does not exist"});
+        } else {
+            return res.json(assignment.file.toString());
+        }
+    }).catch(err => console.log(err));
+});
+
+
 // @route GET api/postings/submissions/:id
 // @desc Get all submissions for posting
 // @access Public
@@ -56,7 +73,18 @@ router.get("/submissions/:id", async (req, res) => {
     let finalSubmissions = [];
 
     submissions.forEach(element => {
-        finalSubmissions.push(element);
+
+        const noFileAssignment = {
+            "_id": element._id,
+            "studentId": element.studentId,
+            "grade": element.grade,
+            "name": element.name,
+            "studentName": element.studentName,
+            "posting": element.posting,
+            "date": element.date
+        }
+
+        finalSubmissions.push(noFileAssignment);
     });
 
     return res.json(finalSubmissions);
@@ -93,7 +121,6 @@ router.post("/submit", async (req, res) => {
         //first, check for existing submission
         Assignment.findOne({ studentId: ObjectId(req.body.student_id), posting: ObjectId(req.body.posting_id) }).then(assignment => {
             if(assignment) {
-                
                 //remove existing assignment from student assignments array
                 User.findById(assignment.studentId, function (err, user) {
                     var removedAssign = user.assignments.filter(function(e) { if(e.toString().localeCompare(assignment._id.toString()) !== 0) { return e; } });
@@ -118,11 +145,11 @@ router.post("/submit", async (req, res) => {
                 });
 
                 //delete file from folder
-                try {
+                /*try {
                     fs.unlinkSync("client/public" + assignment.filePath)
                 } catch(err) {
                     console.error(err)
-                }
+                }*/
                 
                 //delete existing assignment from database
                 assignment.remove();
@@ -143,14 +170,15 @@ router.post("/submit", async (req, res) => {
             }
 
             const assign = fs.readFileSync(req.file.path, 'utf8');
-            /*console.log(assign); extracts text from file*/
+            const assignBin = fs.readFileSync(req.file.path);
+            //console.log(assignBin.toString()); //extracts text from file
            
             const finalAssignment = new Assignment({
                 name: req.file.originalname,
                 studentId: req.body.student_id,
                 studentName: req.body.student_name,
                 posting: req.body.posting_id,
-                filePath: req.file.path.substr(13)
+                file: assignBin
             }).save().then(assignment => {
                     User.findById(req.body.student_id).then(user => {
                         user.assignments.push(assignment._id);
@@ -207,30 +235,48 @@ router.post("/new", (req, res) => {
 // @desc Check for plagiarsim between two files
 // @access Public
 router.post("/plagiarism-check", (req, res) => {
-    const dir = process.cwd();
-    const firstFile = req.body.first;
+    first_id = req.body.first;
+    first_text = "";
 
-    try {
-        const first_text = fs.readFileSync("client/public" + req.body.first, 'utf8');
-    } catch(err) { return res.status(400).json({message: "file was not found at: " + dir + "/client/public" + firstFile})};
+    Assignment.findById(ObjectId(first_id)).then(assignment => {
+        first_text = assignment.file.toString();
+        //console.log(first_text);
+    }).catch(err => console.log(err));
 
     //if 2 assignments were selected or only 2 assignments were submitted
     if(!Array.isArray(req.body.second) || req.body.second.length === 2) {
-        const second_text = fs.readFileSync("client/public" + req.body.second, 'utf8');
-        //compare both texts
-        var result = stringSimilarity.compareTwoStrings(first_text, second_text); 
-        var message = "The assignments are " + (result*100).toFixed(2) + "% similar.";
-        return res.json({message: message, directory: dir});
+        second_id = req.body.second;
+        second_text = "";
+        
+        Assignment.findById(ObjectId(second_id)).then(assignment => {
+            second_text = assignment.file.toString();
+            //console.log(second_text);
+            //compare both texts
+            console.log(first_text + " " + second_text);
+            var result = stringSimilarity.compareTwoStrings(first_text, second_text); 
+            var message = "The assignments are " + (result*100).toFixed(2) + "% similar.";
+            return res.json({message: message});
+        }).catch(err => console.log(err));
+        
     } else {
+        text_list = [];
+
         //get all assignments that are not the selected assignment
-        var submissions = req.body.second.filter(function(e) { if(e.filePath.toString().localeCompare(req.body.first) !== 0) { return e; }})
+        var submissions = req.body.second.filter(function(e) { if(e._id.toString().localeCompare(req.body.first) !== 0) { return e; }})
         //create an array of assignment text
-        var submissionsText = submissions.map(e => fs.readFileSync("client/public" + e.filePath, 'utf8'));
-        var result = stringSimilarity.findBestMatch(first_text, submissionsText); 
-        //find best match
-        var fileName = getNameFromText(result.bestMatch.target, result, submissions);
-        var message = "The selected assignment is most similar to " + fileName + " with " + (result.bestMatch.rating*100).toFixed(2) + "% similarity.";
-        return res.json({message: message, directory: dir});
+
+        Assignment.find({ _id: {$in: submissions} }).then(assignments => {
+            assignments.forEach(assignment => {
+                text_list.push(assignment.file.toString());
+            })
+
+            var result = stringSimilarity.findBestMatch(first_text, text_list); 
+
+            //find best match
+            var fileName = getNameFromText(result.bestMatch.target, result, submissions);
+            var message = "The selected assignment is most similar to " + fileName + " with " + (result.bestMatch.rating*100).toFixed(2) + "% similarity.";
+            return res.json({message: message});
+        }).catch(err => console.log(err));
     }
     
     function getNameFromText(text, result, submissions) {
