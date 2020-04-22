@@ -1,5 +1,16 @@
+.loginContainer {
+    height: 100vh;
+    background: linear-gradient(166deg, rgba(39,29,213,1) 4%, rgba(159,50,176,1) 50%, rgba(255,0,97,1) 100%);
+}
+
 .formContainer {
     padding-top: 5vh;
+    background-color: #ffffff;
+    width: 60%;
+    max-width: 420px;
+    min-width: 270px;
+    margin: auto;
+    border-radius: 15px;
 }
 
 .changeAuth {
@@ -14,22 +25,24 @@
     font-weight: bold;
     display: block;
     width: 100%;
-    margin: 20px 0 10px 0;
+    padding: 15px 0;
+    color: #ffffff;
 }
 
 .inputLabel {
     display: block;
-    width: 60%;
+    width: 80%;
+    font-weight: bold;
     margin: auto;
 }
 
 .textInput {
-    width: 60%;
+    width: 80%;
     margin: auto;
 }
 
 .btnContainer {
     display: flex;
-    width: 60%;
+    width: 80%;
     margin: auto;
 }

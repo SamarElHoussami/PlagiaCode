@@ -28,6 +28,12 @@
     position: absolute;
 }
 
+@media( max-width: 500px ) {
+    .rmvBtn {
+        transform: translate(-16px, -73px);
+    }
+}
+
 .editCoursesBtn {
     display: inline;
     cursor: pointer;
@@ -55,19 +61,21 @@
 }
 
 .listItem:hover {
-    border: 2px solid rgb(175, 84, 237);
     transform: scale(1.1);
+    transition: ease-in;
     cursor: pointer;
 }
 
 .addBtn {
     background-image: url("../images/plus.PNG");
-    border: 2px solid rgb(175, 84, 237);
+    border: 1px solid rgb(206,206,206);
     height: 170px;
     width: 170px;
     background-color: #ffffff;
     background-size: contain;
     border-radius: 4px;
+    background-position: center;
+    background-repeat: no-repeat;
     margin: 20px;
     justify-content: center;
     display: flex;
@@ -78,17 +86,20 @@
     border: 2px solid rgb(175, 84, 237);
     transform: scale(1.1);
     cursor: pointer;
+    transition: ease-in;
 }
 
 @media( max-width: 500px ) {
     .listItem {
-        height: 160px;
-        width: 160px;
+        height: 145px;
+        width: 100%;
+        transition: ease-in;
     }
 
     .addBtn {
-        height: 160px;
-        width: 160px;
+        height: 145px;
+        width: 100%;
+        transition: ease-in;
     }
 }
 

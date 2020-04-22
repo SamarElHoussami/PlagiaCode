@@ -14,17 +14,18 @@
     background-size: 100% 300px;
     display: flex;
     margin-bottom: 20px;
+    height: 140px;
 }
 
 .profilePic {
-    max-width: 11%;
-    padding: 12px;
-    display: inline;
+    padding: 25px;
+    display: block;
     object-fit: contain;
+    height: 100%;
 }
 
 .userInfo {
-    display: inline-block;
+    display: block;
     margin-bottom: auto;
     margin-top: auto;
 }
@@ -38,8 +39,12 @@
 @media( max-width: 530px ) {
     .userName {
         color: #ffffff;
-        font-size: 27px;
+        font-size: 50px;
         margin: 0;
+    }
+
+    .bgHeader {
+        height: 120px;
     }
 }
 

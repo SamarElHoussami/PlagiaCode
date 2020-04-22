@@ -136,6 +136,7 @@ li {
     background-size: 100% 300px;
     display: flex;
     text-align: center;
+    height: 145px;
 }
 
 .courseInfo {
@@ -154,8 +155,16 @@ li {
 @media( max-width: 530px ) {
     .courseName {
         color: #ffffff;
-        font-size: 27px;
+        font-size: 50px;
         margin-top: 10px;
+    }
+
+    .courseInfo {
+        padding-bottom: 4px;
+    }
+
+    .bgHeader {
+        height: 120px;
     }
 }
 

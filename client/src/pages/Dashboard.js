@@ -89,13 +89,15 @@ class Dashboard extends Component {
             return (
                 <div>
                     <div className={styles.bgHeader}>
-                        <div style={{display: "flex", justifyContent: "center"}}>
-                            {this.state.user.type === "Student" ? <img src={img_student} className={styles.profilePic}/> : <img src={img_teacher} className={styles.profilePic}/>}  
+                        <Container>
+                        <div style={{display: "flex", justifyContent: "space-between", height: "100%"}}>
                             <div className={styles.userInfo}>
                                 <h3 className={styles.userName}>{this.state.user.name}</h3>
-                                <h5 className={styles.userType}><b>Type:</b> {this.state.user.type}</h5>
+                                <h5 className={styles.userType}>{this.state.user.type}</h5>
                             </div>
+                            {this.state.user.type === "Student" ? <img src={img_student} className={styles.profilePic}/> : <img src={img_teacher} className={styles.profilePic}/>}  
                         </div>
+                        </Container>
                     </div>
                     <Container>
                     {this.renderMyClasses()}    

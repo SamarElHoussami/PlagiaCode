@@ -58,7 +58,7 @@ class Login extends Component {
       }).catch(err => {
        console.log('caught it!',err);
       });
-      
+
     e.preventDefault();
     let userData = this.state.User;
     fetch('/api/users/login', {
@@ -104,8 +104,8 @@ class Login extends Component {
           />
         )} else {
           return (
-            <Fragment>
-            <h1 className={styles.pageTitle}>Login</h1><hr/>
+            <div className={styles.loginContainer}>
+            <h1 className={styles.pageTitle}>Login</h1>
             <div className={styles.formContainer}>
               <form className="container" onSubmit={this.handleFormSubmit}>
 
@@ -137,7 +137,7 @@ class Login extends Component {
                 <Link to="/register">Don't have an account? Register!</Link>
               </div>
             </div>
-            </Fragment>
+            </div>
           );
         }
       }
@@ -146,8 +146,10 @@ class Login extends Component {
 
 const buttonStyle = {
     display: "block",
-    width: "60%",
-    margin: "auto"
+    width: "80%",
+    margin: "auto",
+    backgroundColor: "#9d42b1",
+    border: "none"
 };
 
 export default Login

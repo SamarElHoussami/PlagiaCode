@@ -88,8 +88,8 @@ class Register extends Component {
 
   render() {
     return (
-      <Fragment>
-      <h1 className={styles.pageTitle}>Register</h1><hr/>
+      <div className={styles.loginContainer}>
+      <h1 className={styles.pageTitle}>Register</h1>
       <div className={styles.formContainer}>
         <form className="container" onSubmit={this.handleFormSubmit}>
 
@@ -151,14 +151,16 @@ class Register extends Component {
           <Link to="/login">Already have an account? Login!</Link>
         </div>
       </div>
-      </Fragment>
+      </div>
     );
   }
 }
 
 const buttonStyle = {
   margin: "auto",
-  width: "45%"
+  width: "45%",
+  backgroundColor: "#9d42b1",
+  border: "none"
 };
 
 export default Register
