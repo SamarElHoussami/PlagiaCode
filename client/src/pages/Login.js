@@ -132,7 +132,7 @@ class Login extends Component {
                   value={this.state.User.email}
                   placeholder={"Enter your email"}
                   handleChange={this.handleInput}
-                  style={this.generateStyle("email")}/> {/* Email of user */}
+                  style={this.generateStyle("emailnotfound")}/> {/* Email of user */}
 
                 <Input type={"password"}
                   title={"Password"}
@@ -140,7 +140,7 @@ class Login extends Component {
                   value={this.state.User.password}
                   placeholder={"Create a password"}
                   handleChange={this.handleInput}
-                  style={this.generateStyle("password")}/> {/* Password of user */}
+                  style={this.generateStyle("passwordincorrect")}/> {/* Password of user */}
 
                 <p style={{color: "red", textAlign: "center", fontSize: "19px", fontWeight: "bold"}}>{this.state.errorMessage}</p>
                 
