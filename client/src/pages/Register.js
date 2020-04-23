@@ -21,12 +21,15 @@ class Register extends Component {
       },
 
       typeOptions: ['Student', 'Teacher'],
+      errors: [],
+      errorMessage: ""
 
     }
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
     this.handleClearForm = this.handleClearForm.bind(this);
 
-    this.handleInput = this.handleInput.bind(this)
+    this.handleInput = this.handleInput.bind(this);
+    this.generateStyle = this.generateStyle.bind(this);
 
   }
 
@@ -59,7 +62,24 @@ class Register extends Component {
     }).then(response => {
       if(!response.ok) {
         response.json().then(data => {
-          alert(JSON.stringify(data)) //TODO: show errors to user
+          const errorNames = Object.keys(data);
+          var errors = [];
+          errorNames.forEach(error => {
+              errors.push(error);
+          });
+
+          var errorMessage = "";
+          if(errorNames.length === 1) {
+            errorMessage = Object.values(data)[0];
+          } else {
+            errorMessage = "Please input required fields";
+          }
+
+          this.setState({
+            errors: errors,
+            errorMessage: errorMessage
+          });
+          //alert(JSON.stringify(errorMessage)) //TODO: show errors to user
         });
       }
       else {
@@ -86,6 +106,20 @@ class Register extends Component {
     });
   }
 
+  generateStyle(name) {
+    if(this.state.errors.includes(name)) {
+      const style = {
+        border: "2px solid red"
+      }
+      return style;
+    } else {
+      const style = {
+      }
+
+      return style;
+    }
+  }
+
   render() {
     return (
       <div className={styles.loginContainer}>
@@ -98,35 +132,42 @@ class Register extends Component {
             name={"name"}
             value={this.state.newUser.name}
             placeholder={"Enter your name"}
-            handleChange={this.handleInput}/> {/* Name of the user */}
+            handleChange={this.handleInput}
+            style={this.generateStyle("name")}/> {/* Name of the user */}
 
           <Input type={"text"}
             title={"Email"}
             name={"email"}
             value={this.state.newUser.email}
             placeholder={"Enter your email"}
-            handleChange={this.handleInput}/> {/* Email of user */}
+            handleChange={this.handleInput}
+            style={this.generateStyle("email")}/> {/* Email of user */}
 
           <Input type={"password"}
             title={"Password"}
             name={"password"}
             value={this.state.newUser.password}
             placeholder={"Create a password"}
-            handleChange={this.handleInput}/> {/* Password of user */}
+            handleChange={this.handleInput}
+            style={this.generateStyle("password")}/> {/* Password of user */}
 
           <Input type={"password"}
             title={"Re-enter Password"}
             name={"password2"}
             value={this.state.newUser.password2}
             placeholder={"Re-enter password"}
-            handleChange={this.handleInput}/> {/* Password of user */}
+            handleChange={this.handleInput}
+            style={this.generateStyle("password2")}/> {/* Password of user */}
 
           <Select title={"I am a: "}
             name={"type"}
             options={this.state.typeOptions}
             value={this.state.newUser.type}
             placeholder={"Select type of user"}
-            handleChange={this.handleInput}/> {/* Type Selection */}
+            handleChange={this.handleInput}
+            style={this.generateStyle("type")}/> {/* Type Selection */}
+
+            <p style={{color: "red", textAlign: "center", fontSize: "19px", fontWeight: "bold"}}>{this.state.errorMessage}</p>
 
           <div className={styles.btnContainer}>
             <Button

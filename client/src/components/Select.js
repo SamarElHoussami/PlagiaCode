@@ -11,6 +11,7 @@ const Select = props => {
         value={props.value}
         onChange={props.handleChange}
         className={[styles.textInput, "form-control"].join(' ')}
+        style={props.style}
       >
         <option value="" disabled>
           {props.placeholder}

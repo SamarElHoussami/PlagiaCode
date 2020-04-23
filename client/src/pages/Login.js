@@ -15,11 +15,14 @@ class Login extends Component {
       User: {
         email: '',
         password: '',
-      }
+      },
+      errors: [],
+      errorMessage: ""
     }
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
     this.handleInput = this.handleInput.bind(this)
     this.handleUserLogout = this.handleUserLogout.bind(this);
+    this.generateStyle = this.generateStyle.bind(this);
 
   }
 
@@ -39,26 +42,22 @@ class Login extends Component {
     );
   }
 
-  handleFormSubmit(e) {
-    fetch('/api/users/test', {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
+    generateStyle(name) {
+    if(this.state.errors.includes(name)) {
+      const style = {
+        border: "2px solid red"
       }
-    }).then(response => {
-      if(!response.ok) {
-        alert("server not working");
+      return style;
+    } else {
+      const style = {
       }
-      else {
-        response.json().then(data => {
-          return data; //return success if api works
-        })
-      }
-      }).catch(err => {
-       console.log('caught it!',err);
-      });
 
+      return style;
+    }
+  }
+
+
+  handleFormSubmit(e) {
     e.preventDefault();
     let userData = this.state.User;
     fetch('/api/users/login', {
@@ -70,7 +69,25 @@ class Login extends Component {
       }
     }).then(response => {
       if(!response.ok) {
-        alert("Invalid Credentials");
+       response.json().then(data => {
+          const errorNames = Object.keys(data);
+          var errors = [];
+            errorNames.forEach(error => {
+                errors.push(error);
+            });
+
+            var errorMessage = "";
+            if(errorNames.length === 1) {
+              errorMessage = Object.values(data)[0];
+            } else {
+              errorMessage = "Please input required fields";
+            }
+
+            this.setState({
+              errors: errors,
+              errorMessage: errorMessage
+            });
+        });
       }
       else {
         response.json().then(data => {
@@ -114,15 +131,19 @@ class Login extends Component {
                   name={"email"}
                   value={this.state.User.email}
                   placeholder={"Enter your email"}
-                  handleChange={this.handleInput}/> {/* Email of user */}
+                  handleChange={this.handleInput}
+                  style={this.generateStyle("email")}/> {/* Email of user */}
 
                 <Input type={"password"}
                   title={"Password"}
                   name={"password"}
                   value={this.state.User.password}
                   placeholder={"Create a password"}
-                  handleChange={this.handleInput}/> {/* Password of user */}
+                  handleChange={this.handleInput}
+                  style={this.generateStyle("password")}/> {/* Password of user */}
 
+                <p style={{color: "red", textAlign: "center", fontSize: "19px", fontWeight: "bold"}}>{this.state.errorMessage}</p>
+                
                 <Button
                   action={this.handleFormSubmit}
                   type={"primary"}
