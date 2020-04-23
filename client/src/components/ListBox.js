@@ -325,7 +325,6 @@ class ListBox extends React.Component {
                         studentOpts.push(<option key={data[i]._id} value={data[i].name}>{data[i].name}</option>);
                         studentObj.push(data[i]);      
                     }
-
                     this.setState({
                             studentOpts: studentOpts,
                             allStudents: studentObj,
@@ -352,13 +351,14 @@ class ListBox extends React.Component {
                 console.log("AFTER API CALL FOR COURSES: " + response.data);
             } else {
                 response.json().then(data => {
-
                     var listOpts = [];
                     var courseObj = [];
 
                     if(data.length === 0) {
                         this.setState({
-                            courseOpts: <option key={0} value={0}>No courses available</option>
+                            courseOpts: <option key={0} value={0}>No courses available</option>,
+                            loading: this.state.loading + 1,
+                            allCourses: null
                         });
                         return;
 
@@ -447,8 +447,14 @@ class ListBox extends React.Component {
             } else {
                 response.json().then(data => {
                     this.props.handleUpdate(data.user);
-                    var joinedNames = this.state.myCourseNames.concat(data.course.name);
-                    var joinedCourses = this.state.allCourses.concat(data.course);
+
+                    if(this.state.myCourseNames !== null && this.state.myCourseNames.length !== 0){
+                        var joinedNames = this.state.myCourseNames.concat(data.course.name);
+                        var joinedCourses = this.state.allCourses.concat(data.course);
+                    } else {
+                        var joinedNames = [data.course.name];
+                        var joinedCourses = [data.course];
+                    }
 
                     this.setState({
                         myCourseNames: joinedNames,

@@ -8,7 +8,7 @@
     background-color: #ffffff;
     width: 60%;
     max-width: 420px;
-    min-width: 270px;
+    min-width: 350px;
     margin: auto;
     border-radius: 15px;
 }
@@ -31,18 +31,18 @@
 
 .inputLabel {
     display: block;
-    width: 80%;
+    width: 90%;
     font-weight: bold;
     margin: auto;
 }
 
 .textInput {
-    width: 80%;
+    width: 90%;
     margin: auto;
 }
 
 .btnContainer {
     display: flex;
-    width: 80%;
+    width: 90%;
     margin: auto;
 }

@@ -38,23 +38,15 @@ class Dashboard extends Component {
     }
 
     renderMyClasses() {
-        if(this.state.user.courses.length != 0) {
-            return (
-                <Row xs={12}>
-                    <Col xs={12}>
-                        {console.log(this.state)}
-                        <ListBox type="courses" handleUpdate={this.props.handleUpdate}/>
-                    </Col>
-                    {this.renderMyTaClasses()}
-                </Row>
-            )
-        } else {
-            return (
-                <Fragment>
-                <ListBox type="courses" handleUpdate={this.props.handleUpdate}/>
-                </Fragment>
-            )
-        }
+        return (
+            <Row xs={12}>
+                <Col xs={12}>
+                    {console.log(this.state)}
+                    <ListBox type="courses" handleUpdate={this.props.handleUpdate}/>
+                </Col>
+                {this.renderMyTaClasses()}
+            </Row>
+        )    
     } 
 
     renderMyTaClasses() {

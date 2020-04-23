@@ -146,7 +146,7 @@ class Login extends Component {
 
 const buttonStyle = {
     display: "block",
-    width: "80%",
+    width: "90%",
     margin: "auto",
     border: "none"
 };

@@ -59,7 +59,7 @@ class Register extends Component {
     }).then(response => {
       if(!response.ok) {
         response.json().then(data => {
-          console.log(JSON.stringify(data)); //TODO: show errors to user
+          alert(JSON.stringify(data)) //TODO: show errors to user
         });
       }
       else {

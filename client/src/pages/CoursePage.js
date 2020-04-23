@@ -140,7 +140,8 @@ class CoursePage extends React.Component {
     }
 
     isTa(courseTa, student) {
-        return courseTa[0]._id.localeCompare(student._id) === 0;
+        if(courseTa) return courseTa[0]._id.localeCompare(student._id) === 0; 
+        return false;
     }
 
     hasCourse() {
@@ -163,7 +164,6 @@ class CoursePage extends React.Component {
         let subs = null;
         
         if(this.state.submissions !== null) {
-            {console.log(JSON.stringify(this.state.submissions))}
             return subs = this.state.submissions.map((element) => 
                 <div key={element.studentName}>
                     <hr className={styles.separator}/>
@@ -175,16 +175,16 @@ class CoursePage extends React.Component {
                             onChange={this.handleCompare}
                         />
                     </label>
-                    <p><b>Assignment:</b> <a href="">{element.name}</a></p>
-                    <p><b>Grade:</b> {element.grade === -1 ? "not graded" : element.grade}</p>
-                    <p><b>Submitted:</b> {this.dateToText(element.date).date} {this.dateToText(element.date).time} {this.isLate(element.date, curPosting.due_date)}</p>
+                    <p style={{paddingLeft: "20px", margin: "3px"}}><b>Assignment:</b> <a href="">{element.name}</a></p>
+                    <p style={{paddingLeft: "20px", margin: "3px"}}><b>Grade:</b> {element.grade === -1 ? "not graded" : element.grade}</p>
+                    <p style={{paddingLeft: "20px", margin: "3px"}}><b>Submitted:</b> {this.dateToText(element.date).date} {this.dateToText(element.date).time} {this.isLate(element.date, curPosting.due_date)}</p>
                     
                 </div>
             ); 
         } else { return null}
     }
 
- /*   getFile(assignment_id, filename) {
+    getFile(assignment_id, filename) {
         fetch(`/api/postings/getFile/${assignment_id}`, {
             method: "GET",
             headers: {
@@ -193,9 +193,7 @@ class CoursePage extends React.Component {
             }
         }).then(response => {
             response.json().then(data => {
-                var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
-                saveAs(blob, filename);
-
+                
                 //return 'data:text/plain;charset=utf-8,' + data;
             })
             
@@ -203,18 +201,19 @@ class CoursePage extends React.Component {
             console.log('caught it!',err);
             return null
         });
-    }*/
+    }
 
     isLate(subDate, dueDate) {
         let sub = new Date(subDate.substr(0,16))
         let due = new Date(dueDate.substr(0,16))
 
-        if(sub.getFullYear() <= due.getFullYear() && sub.getMonth() <= due.getMonth() && (sub.getDate()-1) < due.getDate()) {
+
+        if(sub.getFullYear() <= due.getFullYear() && sub.getMonth() <= due.getMonth() && sub.getDate() < due.getDate()) {
             return(
                 <b style={{ color:"green" }}>ON TIME</b>
             )
         }
-        else if(sub.getFullYear() == due.getFullYear() && sub.getMonth() == due.getMonth() && (sub.getDate()-1) == due.getDate() && sub.getHours() <= due.getHours() && sub.getMinutes() < due.getMinutes()) {
+        else if(sub.getFullYear() == due.getFullYear() && sub.getMonth() == due.getMonth() && sub.getDate() == due.getDate() && sub.getHours() <= due.getHours() && sub.getMinutes() < due.getMinutes()) {
             return(
                 <b style={{ color:"green" }}>ON TIME</b>
             )
@@ -232,16 +231,24 @@ class CoursePage extends React.Component {
             return (
                 <Fragment>
                     <p className={styles.note}>*check 2 students to compare, check one student to find best match</p>
-                    <Button style={{float:"right"}} variant="primary" onClick={this.handleSubmitCompare}>Check Plagiarism</Button> 
+                    <Button style={{float:"right", width: "100%"}} variant="primary" onClick={this.handleSubmitCompare}>Check Plagiarism</Button> 
                 </Fragment>
             );
         } else {
             return (
                 <Fragment>
                     <p className={styles.note}>*check 2 students to compare, check one student to find best match</p>
-                    <Button style={{float:"right"}} variant="primary" disabled>Check Plagiarism</Button> 
+                    <Button style={{float:"right", width: "100%"}} variant="primary" disabled>Check Plagiarism</Button> 
                 </Fragment>
             );
+        }
+    }
+
+    isInClass(studentId, allStudents) {
+        if(allStudents && allStudents.length !== 0) {
+            return allStudents.includes(studentId);
+        } else {
+            return false;
         }
     }
 
@@ -271,7 +278,7 @@ class CoursePage extends React.Component {
                     
                         <p style={{textAlign: "center"}}><b>Due Date:</b><br/>{this.dateToText(curPosting.due_date).date} {this.dateToText(curPosting.due_date).time}</p>
                         
-                        {this.state.user.type === "Student" && !this.isTa(this.state.ta, this.state.user)? 
+                        {this.state.user.type === "Student" && !this.isTa(this.state.ta, this.state.user) && this.isInClass(this.state.user._id, this.state.course.students)? 
                             <Fragment>
                             <hr/>
                             <p style={{margin: "20px 0"}}> <b>Submit Assignment</b></p>
@@ -285,11 +292,15 @@ class CoursePage extends React.Component {
                     </div>
                     </Modal.Body>
                     <Modal.Footer className={styles.modalFooter}>
-                        {this.state.user.type === "Teacher" || this.isTa(this.state.ta, this.state.user)? this.renderCompareButton(this.state.toCompare) : <Button style={{width: "100%"}} variant="primary" onClick={this.handleSubmit}>Submit</Button>} 
+                        {this.state.user.type === "Teacher" || this.isTa(this.state.ta, this.state.user)? this.renderCompareButton(this.state.toCompare) : this.renderSubmit(this.isInClass(this.state.user._id, this.state.course.students))} 
                     </Modal.Footer>
                 </Modal>
             );
         }
+    }
+
+    renderSubmit(isInClass) {
+        return isInClass ? <Button style={{width: "100%"}} variant="primary" onClick={this.handleSubmit}>Submit</Button> : <Button style={{width: "100%"}} variant="primary" disabled>Add Class to Submit</Button>
     }
 
     renderCreateModal() {
@@ -341,7 +352,7 @@ class CoursePage extends React.Component {
                     }}>{item.name}</a></li>
             )
         } else {
-            return listItems = <h1>This course does not have any {object} yet!</h1>;
+            return <li>No TA</li>;
         }
     }
 
@@ -392,7 +403,6 @@ class CoursePage extends React.Component {
 
     render() {
         if(this.state.course !== null && this.state.loading == 5) {
-            {console.log(this.state.toCompare)}
             return (
                 <Fragment>
                     <div className={styles.bgHeader}>
@@ -629,9 +639,13 @@ class CoursePage extends React.Component {
                 body: data,
 
             }).then(response => {
-                
+                if(response.ok) {
                     alert("Assignment successfully uploaded");
                     this.handleClose();
+                } else {
+                    alert(response);
+                    this.handleClose();
+                }   
             }).catch(err => {
                 console.log('caught it!',err);
                 alert("An error occured. Please make to select a file before uploading.");
@@ -648,7 +662,6 @@ class CoursePage extends React.Component {
             }
         }).then(response => {
             response.json().then(data => {
-                console.log("Successful" + JSON.stringify(data));
                 this.setState({
                     submissions: data
                 })
